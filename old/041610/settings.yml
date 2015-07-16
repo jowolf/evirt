@@ -1,0 +1,7 @@
+hosts:
+    - http://localhost:16861
+    - http://desqhost.com:16861
+
+port: 16861
+
+vm_path: /vm

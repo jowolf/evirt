@@ -1,0 +1,9 @@
+Current authors:
+
+Forest Bond <forest@alittletooquiet.net>
+
+
+inotifyx is a derived work, based on the following:
+
+python-inotify by Manuel Amador <rudd-o@rudd-o.com>
+inotify-glue.c from Beagle <http://beagle-project.org>

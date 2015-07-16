@@ -1,0 +1,57 @@
+#NameVirtualHost *
+<VirtualHost *>
+	ServerName librehost.com
+	ServerAlias www.librehost.com librehosting.com www.librehosting.com
+	ServerAdmin webmaster@librehosting.com
+
+	DocumentRoot /var/www/
+
+        SetHandler python-program
+	PythonHandler django.core.handlers.modpython
+	SetEnv DJANGO_SETTINGS_MODULE libre.settings
+	PythonDebug Off
+	PythonPath "['/root/libre'] + sys.path"
+
+	#<Location "/tiny_mce">SetHandler None</Location>
+	#<Location "/images">SetHandler None</Location>
+	#<Location "/css">SetHandler None</Location>
+	#<Location "/js">SetHandler None</Location>
+
+	<LocationMatch "/(images|logos)/.*\.(jpeg|jpg|gif|png)$">
+	  SetHandler None
+	</LocationMatch>
+
+	<LocationMatch "/css/.*\.css$">
+	  SetHandler None
+	</LocationMatch>
+
+	<LocationMatch "/java/.*\.(jar|js|class)$">
+	  SetHandler None
+	</LocationMatch>
+
+	<LocationMatch "/js/.*\.js$">
+	  SetHandler None
+	</LocationMatch>
+
+	<LocationMatch "/swf/.*\.swf$">
+	  SetHandler None
+	</LocationMatch>
+
+	<LocationMatch "/tiny_mce/.*\.(js|txt|htm|gif|png|css)$">
+	  SetHandler None
+	</LocationMatch>
+
+	#<LocationMatch "\.(jpg|jpeg|gif|png|ico|js|css|jar|swf)$">
+	 #SetHandler None
+	#</LocationMatch>
+	
+	ErrorLog /var/log/apache2/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog /var/log/apache2/access.log combined
+	ServerSignature On
+
+</VirtualHost>

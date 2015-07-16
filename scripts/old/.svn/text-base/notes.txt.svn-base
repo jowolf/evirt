@@ -1,0 +1,49 @@
+10/3/08
+more generic, for non-ubu-createvm OSes too:
+- start w/basic install - script to create empty install envo (done, needs to be organized into subfolders)
+- script to update/change name, and update pkgs - yum, apt-get update, etc
+- script to install / preinstall working envo - django, rails, etc
+- script to postinstall applications - examples, photologue, etc
+
+create_empty, pre_install, install_envo, post_install?
+
+
+JJW 10/1/08
+
+new plan:
+createvm/new contains the root.qcow unconfigured ubu804 instance
+
+copy, rename, start, wait 1 minute, ssh in, start the install
+
+
+JJW 9/14/08
+Notes for installation / provisioning:
+
+- most /etc/ config files should be symlinked from this tree, which is version-controlled
+making it much easier to do updates
+
+
+
+OTHER NOTES:
+
+- prep kvm modules, both kvm and kvm-[amd,intel]
+
+- add group kvm, set up www-data
+
+- /etc/init.d/kvm (may be already set uyp by ubuntu)
+
+
+From:  /etc/sudoers
+...
+
+# JJW 2/14/08 (VDay!) for libre website to access netstat, sh, etc - 
+# also, don't forget to: chown www-data:kvm /dev/net/tun 
+www-data ALL = NOPASSWD: /bin/netstat, /sbin/ifconfig, /usr/sbin/brctl, /usr/sbin/tunctl
+# /var/www/cgi-bin/auth, /sbin/pfctl, /var/www/htdocs/pfw/bin/*
+# no need for python, it's in apache's conf: /usr/local/bin/*
+
+
+
+From: /etc/udev/rules.d/45-kvm.rules
+
+KERNEL=="kvm", NAME="%k", GROUP="kvm", MODE="0660"

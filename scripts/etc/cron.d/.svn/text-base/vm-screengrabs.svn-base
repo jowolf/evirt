@@ -1,0 +1,7 @@
+# Copyright (c) Joseph Wolff and the Libre Group 2008
+#
+# /etc/cron.d/vm-screengrabs: crontab fragment for vm -s screengrabs
+
+#  This loops through the active VMs and does a screengrab, saving as 4 diff sizes
+
+*/3 * * * *     www-data   /usr/local/bin/vm -s

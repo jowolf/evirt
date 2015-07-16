@@ -1,0 +1,14 @@
+#! /bin/sh
+#
+# cron script to bounce the bridge for flakey 2-week outages problem.
+#
+# Written by JJW 12/1/07
+
+ifdown br0; ifup br0
+
+sleep 5
+
+#/etc/init.d/dhcp restart  JJW 2/8/8
+/etc/init.d/dhcp3-server restart
+
+/root/ensurepingableips.rb

@@ -1,0 +1,30 @@
+# extrapkgs.sh - extra packages to include in createvm -
+# using Joe's Excellent vHosting framework (EVH Framework?!) for KVM, etc
+# copyright (c) 2007-13 Joseph J Wolff
+
+
+#extra="  --addpkg xrdp --addpkg lubuntu-desktop "
+#extra="  --addpkg xrdp --addpkg lxde --addpkg lxsession --addpkg xorg "
+
+
+# wordpress stuff
+
+#extra=" --addpkg lighttpd "
+#extra="  --addpkg wordpress --addpkg wordpress-l10n "
+#--addpkg mysql-server "
+
+
+# JJW 5/15/11 for images
+#extra="  --addpkg nginx-light"
+
+
+# for natty accessories 1st (pre-chef) attempt, no longer needed:
+#extra="  --addpkg postgresql --addpkg postgresql-plpython-8.4 --addpkg ptop --addpkg python-psycopg2 \
+#         --addpkg python-imaging "
+
+
+# mysql stuff for both rails and wordpress - NFG 5/1/09 JJW - it appears that dpkg-cfg errors out in ubu-vm-builder
+
+#extra=" --addpkg mysql-client \
+#        --addpkg mysql-server \
+#        --addpkg phpmyadmin "

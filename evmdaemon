@@ -1,0 +1,119 @@
+#! /usr/bin/env python
+#
+# evmdaemon (.py) Copyright (c) 2007-10 Joseph J Wolff, all rights reserved
+
+
+## eVirt server daemon - runs on any/all vm host, does not need to be the same as the vm client
+# - allows remote caller to start/stop/screengrab/create/manage vm's
+# - uses JsonRPC (or future: RPyC) to communicate
+# - owns the vms dict, directories, start/stop methods, create, etc
+#
+# does NOT own the host list - that's to be in the evm_meta or evm_hosts module
+
+
+#import os, hashlib, random
+
+from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
+from SecureJSONRPCServer import SecureJSONRPCServer
+
+import settings
+
+from evm_server import kvm_server, mynotify
+
+
+trace = 0 or settings.trace
+
+
+# TODO: t dynamic class factory, setup new vm dir, run createvm script
+
+
+print 'KVM Libre Hosting kvm_server standalone module (c)2007-10 Joseph J Wolff & The Libre Group'
+
+
+# Dynamic (sub)class factory, for ssl / nonssl
+
+def dynamic_subclass (ParentJSONRPCServer):
+  class MyJSONRPCServer (ParentJSONRPCServer):
+    timeout = 1
+    timeouts_per_period = 300  # 5 mins
+    timeout_count = 0
+
+
+    def my_serve_forever(self):
+        """Handle one request at a time until shutdown, respecting timeout."""
+        self.__serving = True
+        #self.__is_shut_down.clear()
+        while self.__serving:
+            self.handle_request()
+        #self.__is_shut_down.set()
+
+
+    def handle_timeout (self):
+        if self.timeout_count > self.timeouts_per_period:
+            self.timeout_count = 0
+            self.handle_periodic_maintenance()
+
+        self.timeout_count += 1
+
+        #print 'before inotify check'
+        mynotify.check()
+        #print 'after inotify check'
+
+
+    def handle_periodic_maintenance (self):  # currently 5 mins or so - JJW 4/18/10
+        print 'Periodic maintenance - grab screens, etc'
+        kvm_server.screengrab_all()
+
+    uncomment_for_debug='''
+    def _handle_request_noblock(self):
+        """Handle one request, without blocking.
+
+        I assume that select.select has returned that the socket is
+        readable before this function was called, so there should be
+        no risk of blocking in get_request().
+        """
+        try:
+            request, client_address = self.get_request()
+        except socket.error, e:
+            print 'EXCEPTION', e
+            return
+        if self.verify_request(request, client_address):
+            try:
+                self.process_request(request, client_address)
+            except:
+                self.handle_error(request, client_address)
+                self.close_request(request)
+    '''
+  return MyJSONRPCServer
+
+
+if settings.private_ssl:
+    MyJSONRPCServer = dynamic_subclass (SecureJSONRPCServer)
+    json_server = MyJSONRPCServer (settings.listen_host_port, certFile=settings.cert_file, keyFile=settings.cert_file)
+else:
+    MyJSONRPCServer = dynamic_subclass (SimpleJSONRPCServer)
+    json_server = MyJSONRPCServer (settings.listen_host_port)
+
+json_server.register_instance (kvm_server)
+json_server.register_function (pow)
+json_server.register_function (lambda x,y: x+y, 'add')
+json_server.register_function (lambda x: x, 'ping')
+#json_server.register_function (server.getVmListForRemote, 'getVmList')
+#json_server.register_function (lambda mid, s: server.getVm (mid).monitor.command (s), 'monitor_command')
+
+old='''
+json_server.register_function (get_vm)
+json_server.register_function (get_vm_list)
+json_server.register_function (monitor_command)
+json_server.register_function (control_command)
+json_server.register_function (get_iso_images)
+json_server.register_function (get_disk_images)
+json_server.register_function (get_floppy_images)
+json_server.register_function (get_scripts)
+json_server.register_function (screengrab)
+'''
+
+json_server.my_serve_forever()
+
+mynotify.close()
+

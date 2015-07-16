@@ -1,0 +1,536 @@
+7/4/10
+
+start/restart/graceful/hard stop -
+
+- need evm_controller - (currently evm_hosts) - lists hosts, metalist of all servers
+
+
+5/15 sat
+setup - set_perms, etc
+
+
+
+5/14/10 Fri
+1 hr, get_scripts & scriptnbase working..
+
+
+5/12 Wed
+dependencies:
+    kvm
+    hw v
+    bash
+    daemon
+    python (2.6?)
+    PIL
+    /proc tree
+    rsync?
+    iNotify (present on all newer Linux distros)
+    ruby (ensurepingableIPs)
+    tun/tap
+
+The program 'tunctl' is currently not installed.  You can install it by typing:
+sudo apt-get install uml-utilities
+
+
+distribution:
+    - debian packaging
+    - set perms on scripts dir, evirt dir, etc
+    - symlink evmanager and possbibly evdaemon intopath - /usr/bin?
+
+
+5/11/10
+after run Tait 2p -
+
+server side, script:
+deploy - create /vm/<mid>, <images dir - defaults to /var/www/images>/<mid>, set perms, copy or link to disk img
+archive - mv to <archive dir> with comments appened to fname
+create - frontend to createvm script, keep images in <disk img dir>
+
+three/four opts for imgs:
+ - use existing (move or copy) - both createvm'ed and uploaded, vmdks, etc;
+ - create empty disk and boot from iso
+ - leave empty / none
+
+- need scripts dir
+- opt to set mac in parms.sh
+
+in addition to 'graceful' fm yesterday -
+
+Also, although we could do a cloud-style implem, with every node a ftend and a bkend, with /vm/evirt.lock to arbitrate collisions on each server, this is a 2.0 feature :) - and would require a couchdb-style master db, as well..
+
+
+5/10/10
+c satchmo install
+
+# must have 0.7:
+sudo wget http://bitbucket.org/ubernostrum/django-registration/get/v0.7.tar.bz2
+hg clone https://sorl-thumbnail.googlecode.com/hg/ sorl-thumbnail
+hg clone http://bitbucket.org/andrewgodwin/south/
+hg clone http://bitbucket.org/mmarshall/django-keyedcache
+hg clone http://bitbucket.org/bkroeze/django-livesettings
+hg clone http://bitbucket.org/bkroeze/django-signals-ahoy
+svn checkout http://django-app-plugins.googlecode.com/svn/trunk/ django-app-plugins
+hg clone http://bitbucket.org/bkroeze/django-threaded-multihost
+
+& symlinks to inner module => py dist-pkgs
+
+http://bitbucket.org/bkroeze/django-threaded-multihost/src/b5b1896e3911/threaded_multihost/sites.py
+
+remove bad import in keyedcache (must be an older fork):
+http://bitbucket.org/chris1610/satchmo/changeset/01776e6940fc
+
+Oops, wrong keyedcache, here it is:
+hg clone http://bitbucket.org/bkroeze/django-keyedcache
+
+It's Up!
+
+TODO: OK, now to provisioning:
+- setup: spit out parms, set perms to apache user/group - put in settings
+- makedirs on var/www/images/<mid>
+
+scripts in evirt/scripts, called by evmanager
+
+evmanager status, start, stop, restart, graceful, provision, create(Vm)
+
+graceful - system_powerdown, 20 secs, ctrl-alt-del, 20 secs, (later: ssh w/pki => halt!), stop
+
+
+5/9/10
+remove token auth work - nice idea, not our focus for now.
+Work on getting ssl cert stuff to work, sell consulting to set up new CA for ppl
+poss twisted, try it with just py server
+
+todo:
+    d evmdaemon
+    d evmanager
+    d evmclient_test
+    d evmserver
+    d evmcore
+    t listen (host, port)
+    private_ssl opt
+    test / instead of /RPC2
+    d ssl / secure
+
+    replace netstat / ports2mid with pid file watch inotify stuff
+
+Manager:
+# TODO: test client, start daemon, run createvm script, set up new vm dir with correct perms & noimages
+
+[Twisted-Python] SSL Cert Verification howto
+http://twistedmatrix.com/pipermail/twisted-python/2007-May/015357.html
+
+See also:
+/usr/lib/ssl/misc/CA.sh
+/u1/backup/subnote-gentoo-2006/etc/ssl/misc/CA.sh
+
+More Todo:
+jquery slideshow
+jquery tabs + howto
+blog it, plus blog lucid now available
+blog eucalyptus cloud
+jquery upd eRacks
+eRacks table update
+eRacks DB update
+
+p satchmo install
+
+
+5/8
+nice run to Vasona am! lotsa spring birds!
+nice moment w/Kiddo on bench.
+b took 300+ photos! photos.serog.org
+
+working ssl on django...!
+
+
+
+5/7 fri
+after run around 'block':
+- return new tok in response header
+- idea for time component: mod time into 1min buckets - then try 5 on either side - 10 minute range, without sacrificing randomness!
+
+Maybe just use SSL certs, w/me as rootCA - Gen in place?
+
+revisit django-jsonrpc with SSL, check middleware!
+
+
+richard: send 280 area - comm re picks?
+offer UT trips
+
+eRacks: make some progress!
+
+IGN: ditto - MSI!
+Daniel - FBSD AutoUpdate!
+
+
+5/5 wed
+moved do_POST so it actually gets called :)
+added send_content
+
+
+5/4 tues
+
+8p after run tait!
+X-evirt-token header checked in server.do_POST
+Transport sets it in send_content
+not present returns 401 requires auth
+start with shared secrets in settings - plus IP address of caller - caller_id?
+  future: lookup host w/gethostbyaddr
+sha224 hash of caller_id plus salt - 'evirt' passed to get_auth_token or get_evirt_token
+each successive call re-hashed with shared secret, on both sides
+doesn't match returns 403 forbidden
+"WWW-Authenticate" ":" 1#challenge ?
+
+django-rest and piston look cool, too!
+
+andrew, leeann, sotheby's, bill brooks -
+City of LB?  Monday?!
+
+b's credit - pull report, get atty
+detail my cred, pull report 4 Max's atty
+
+
+vmanager
+vmserver
+vmclient
+vmcore
+vmutil
+vmonitor
+
+config
+settings
+server
+client
+core
+vmanager
+util
+
+
+5/2 sun
+
+Will Shortz:
+100
+100/500
+us city?
+
+after run peralta, us census guy (2wice):
+ssl django bug: remove middleware, etc
+try my serve_forever
+use decorator for login / returning hash
+make each call sequential with shared secret / hash of previous result, with hidden salt
+
+try symmetric json - esp for comet-like behavior!
+lotsa possibilities, to write to a page area directly fm the server!
+more ctrl over closing the connection! (or not!)
+
+django q's - do I need to run separate projects/ or just an autonomous app with it's own settings / script?
+kvm_manager for commandline stuff.
+
+could gen custom cert on the fly during init..
+then call server with http and pass the pub key, then connect w/priv key...
+attacker can't get at the serverby eavesdropping, since it's a pub key..
+
+
+5/1 sat
+big struggle with securing jsonrpc..
+digest auth? ssl? ssh wrap? piggyback on django / tornado / twisted?
+
+
+4/25 sun after big week in Syr and with Byo
+cleanup/reorg for imports - client, server
+renames?
+p iNotify hooks - 
+notes= in parms?
+image/screengrab in server, vs in VmImage?
+or pass in path, & do it in LocalVM? (yes, feels right)
+ 
+
+4/18 sun
+- VmImage(s) class - w/fns fm server, screengrab?
+screengrab is a server-side thing, though..
+VmImagesBase? + LocalVmImages?
+
+rename various classes as VmImages/vmImageConnection, KvmServer/KvmServerConnection, VM/VMConnection?
+
+remotevm.server = jsonproxy
+
+core
+ vmimgs, vmbase
+server
+ kvmserver
+client?
+ imports json server, decls RemoteVM?
+
+
+4/17/10 Sat
+
+OK, new stgy:
+if ip not present, mid must be - and can be any string, but convention says it should be the primary port number (such as 3390)
+
+Still to impleme..
+
+
+4/16/10
+after walk to crazy old man's house on overlook
+
+- settings.py, not yaml
+  (Ports class?)
+
+- VirtualMachineBase, with base_fields or base_vars or base_dict
+
+- move to core, with local & remote vm.
+
+- write methods appropriately.
+
+NOTES MOVED TO EVIRT AS OF TODAY.
+
+
+4/15/10 Thu
+Sheesh.
+
+
+# Notes 1a 4/12/10 mac:
+# - init vm w/args only
+# - upd w/pid/ports fm live
+# - need ports2mid fn org fm vm.init
+# - createVm should mkdir & save kwargs - can call fm ctrlr
+# - editVm can be similar
+
+
+4/14/10 Wed
+
+after run/walk past 2x4x12 retaining wall on overlook -
+
+class RemoteVm (VirtualMachine) poss LocalVm (vm) too...
+media_root, media_url
+still need local webserver for images - use lighty, I guess, or nginx..
+could do djangorpc, then, w/status page(s)..
+
+d Don't forget JetBlue flights..
+n LV? n SFO?
+d SJC!
+
+
+4/12/10
+# Notes 1a 4/12/10 mac:
+# - init vm w/args only
+# - upd w/pid/ports fm live
+# - need ports2mid fn org fm vm.init
+# - createVm should mkdir & save kwargs - can call fm ctrlr
+# - editVm can be similar
+
+d Fix netstat - nfg wuth 'qemu-user-x86-64' or whatever..
+
+after walk up overlook to twin forsale property -
+VirtualMachineClient (or Remote, etc) -
+  override / rpc-ify send, command
+  init fm json dict
+
+yaml config file for ip_base, vm_base, img_base, iso_base, etc - perhaps port ranges, etc
+trace, logfile?
+noimagelist? noimage_640, 80, 150, etc?
+
+python pkg? deb pkg?
+
+
+
+4/11/10
+
+deb packaging
+file locking?
+
+iNotify prototype:
+pseudocode, smth like:
+try
+  get nd
+
+  watch /vm/ for pid files
+
+  # during init / setup:
+  walk
+    add_watch on every vm, set wd, dict by wds
+
+  # during main loop / jsonrpc.handle_timeout:
+  for e in events:
+    if name matches 'parms' set dirty flag
+    if name matches 'output' upd history
+    if path/wd matches /vm/
+      if new dir, set dirty flag (add vm as needed)
+      elif .pid file, upd 'up' flag (or just set livevm_upd_needed flag)
+
+  for vm in vms:
+    if vm.dirty: vm.re-read()
+
+  if livevm_upd_needed:
+    server.upd_live_vms()
+
+finally:
+  rm_all_watches
+  os.dealloc
+
+
+OK, how to access VMs -
+1. ip / int dir name (mostly the same as by mid)
+2. mid - dir name / symlink (do we need by_nmame?)
+3. sid - md5 hash
+4. wd - watch descriptor
+
+*could* put some in the same dict..
+or 3: ints, etc
+
+ways to create vm, places to use:
+    1) meta - vm host list - on vm "client" webserver / controller, in database
+    2) each host - list of vms, access by pid (or mid, sid)
+    3) vm webserver / controller - list vms, display each, allow control / interaction
+
+APIs:
+    send_xx - both
+    screengrab - on host
+    start/stop/restart/status - on host
+    screen_images - get existing - on client
+
+Idea:
+VirtualMachine Client & server objs - what to call them? just vm on server,
+VirtualMachineClient? Proxy? (yuk) on client / webserver / controller? or called the same, import fm 2 places..
+
+host only: watch_descriptor, watch semantics, path stuff
+
+created:
+    host, by disk: no pid, args - watch
+    host, by live: pid/ports (upd to disk vm)
+    client, by rpc - 
+
+
+4/10/10
+depressed. Standstill w/b&a.  A little better pm.  Tina Fey on SNL :)
+
+Use / implem into evirt directory.
+
+Finished kvm monitor!  started on server..
+
+
+4/9/10
+
+jsonrpc?  for django?  mod_python?  Symmetric?
+
+RPyC? with TLS?
+
+What do I need to pass, or on the client?
+
+Import KI Logger I wrote!
+
+KVM VNC certs implem - or SASL - or neatx!
+mon security - TLSWrapper?  or continue to access / proxy all thru localhost?
+
+after walk to 19000 overlook:
+    python iNotify to refresh disk vm list
+    logme decorator, to log infrequest and time-consuming fns - with timer!
+    url to identify vm, and call to server?
+    kvm_meta module, to list servers, and perform cross-server fns?
+    mini-Django server, on each slave node?  What about auth?
+    eventually may need ldap, for this / global auth..
+    nginx, for single-stack implem - elims need 4 mult apache stax, solves (some) lock issues, globals issues
+    ssl?  setup/teardown times are much longer - conn would need to stay open.
+    if always using jsonrpc, then why not use unix sockets or pipes for mon interface?
+
+
+### trace setup & functions
+
+trace = 1
+
+def log (*args, **kw):
+    if not trace: return
+    import sys, inspect, os, pprint
+    stack = inspect.stack()
+    try:
+        pfx = 'in %s.%s.%s:' % (os.path.basename (stack [1][1]), stack [1][3], stack [1][2]) # file, func, line
+        print >> sys.__stdout__, pfx, pprint.pformat (args)
+        for k,v in kw:
+            print >> sys.__stdout__, pfx, k.upper() + ':', pprint.pformat (v)
+    finally:
+        del stack
+
+
+
+
+Notes 4/8/10:
+
+kvm_server - KvmServer  (where to put default server instance?)
+kvm_monitor - Monitor (rename KvmMonitor?), MyTelnet
+kvm_core - VirtualMachine
+kvm_utils? - Cmd, various utils fm top of kvm.py, parser fm meta.py
+
+where to put: vmStorage, vmStorageList?
+
+split out main / commands - kvm_do?
+
+Sphinx for dox
+
+
+other modules...
+
+new name
+
+
+lose the threads / workers
+
+clean the comments
+
+
+Goals: modularity, maintainability, new telnet w/o junk chars, web i/f, *remotification* -
+- revisit Pyro, REST RPC, other py obj tech - 
+
+unambiguous syntax, docs, eventual web pages -
+
+obdjects,
+look again at Django Blocks...
+10/3/08
+more generic, for non-ubu-createvm OSes too:
+- start w/basic install - script to create empty install envo (done, needs to be organized into subfolders)
+- script to update/change name, and update pkgs - yum, apt-get update, etc
+- script to install / preinstall working envo - django, rails, etc
+- script to postinstall applications - examples, photologue, etc
+
+create_empty, pre_install, install_envo, post_install?
+
+
+
+JJW 10/1/08 [From here down moved fm former vm_scripts repo, now scripts dir - JJW 7/18/10]
+
+new plan:
+createvm/new contains the root.qcow unconfigured ubu804 instance
+
+copy, rename, start, wait 1 minute, ssh in, start the install
+
+
+JJW 9/14/08
+Notes for installation / provisioning:
+
+- most /etc/ config files should be symlinked from this tree, which is version-controlled
+making it much easier to do updates
+
+
+
+OTHER NOTES:
+
+- prep kvm modules, both kvm and kvm-[amd,intel]
+
+- add group kvm, set up www-data
+
+- /etc/init.d/kvm (may be already set uyp by ubuntu)
+
+
+From:  /etc/sudoers
+...
+
+# JJW 2/14/08 (VDay!) for libre website to access netstat, sh, etc - 
+# also, don't forget to: chown www-data:kvm /dev/net/tun 
+www-data ALL = NOPASSWD: /bin/netstat, /sbin/ifconfig, /usr/sbin/brctl, /usr/sbin/tunctl
+# /var/www/cgi-bin/auth, /sbin/pfctl, /var/www/htdocs/pfw/bin/*
+# no need for python, it's in apache's conf: /usr/local/bin/*
+
+
+
+From: /etc/udev/rules.d/45-kvm.rules
+
+KERNEL=="kvm", NAME="%k", GROUP="kvm", MODE="0660"

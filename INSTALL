@@ -1,0 +1,67 @@
+Installation instructions:
+
+1) Check for hardware virtualization capability:
+
+egrep '^flags.*(vmx|svm)' /proc/cpuinfo
+
+If yoyu see some output, your hardware is v-capable.
+
+http://www.linux-kvm.org/page/FAQ#How_can_I_tell_if_I_have_Intel_VT_or_AMD-V.3F
+
+
+2) Package dependencies (Tested on Ubuntu 10.04 LTS):
+
+apt-get -y install bash python python-imaging daemon rsync ruby python-inotifyx uml-utilities kvm-pxe dhcp3-server ubuntu-vm-builder
+
+Optional: pwgen
+
+
+3) Python dependencies:
+
+jsonrpclib - included as svn:external, for now
+- Needs to be symlinked into python path, /usr/local/lib/python2.6/dist-packages on Ubu 10.04
+- Or run setup.py from packages / jsonrpclib dir
+
+
+4) Ensure users & groups are set up:
+
+- assume your user is 'joe':
+
+sudo adduser joe kvm
+
+(Assumes there is a KVM group, this is set up byu Ubuntu when kvm is installed).
+
+- Be sure that the kvm group has access to the kvm device:
+
+sudo chown :kvm /dev/kvm
+
+- Be sure that the kvm group has access to the /dev/net/tun device:
+
+sudo chown :kvm /dev/net/tun
+
+- And if you have a vm user, and your vm's under /home/vm, don't forget this:
+
+#sudo adduser vm kvm
+sudo adduser joe vm
+
+XXX set up sudoers for tun / brctl / ifconfig adding stuff?
+%kvm   ALL = NOPASSWD: /sbin/ifconfig, /usr/sbin/brctl, /usr/sbin/tunctl
+
+
+5) Ensure permissions are set up:
+
+./evmanager cleanup <ip or mid>
+
+
+6) set up dhcp server for VMs - if UEC, this is already set up to use dnsmasq for the 192.168.x.x network..
+
+There is a generator script to help with this.
+XXX
+
+7) In general, there is a template of config files to be installed in scripts/etc, including dhcp, etc
+XXX
+
+8) setup:
+
+sudo ln -s `pwd`/evmanager /usr/local/bin/
+sudo ln -s `pwd`/evmdaemon /usr/local/bin/

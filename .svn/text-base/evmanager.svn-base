@@ -1,0 +1,176 @@
+#! /usr/bin/env python
+#
+# evmanager (.py) Copyright (c) 2007-10 Joseph J Wolff, all rights reserved
+
+
+## eVirt Manager - Commandline client / controller - start, stop, snap screengrabs, sandboxes, maint, etc
+
+
+print 'eVirt KVM vMachine manager module (c)2007-10 The Libre Group / Libre Hosting JJW'
+
+from os.path import basename, dirname, split, join
+from os import getcwd
+from optparse import OptionParser
+
+import settings
+
+from evm_server import KvmServer, kvm_server as server, _get_vm, vms # _get_vm_list, 
+
+trace = 1 or settings.trace
+
+
+# TODO:
+# start daemon, run createvm script, set up new vm dir with correct perms & noimages
+# start / stop / restart / status / graceful when in dir, or with mid parm
+
+
+### Set up parser
+
+parser = OptionParser()
+#parser.add_option("-l", "--log", dest="logfile",
+#                help="log to FILE", metavar="FILE")
+#parser.add_option("-q", "--quiet",
+#                action="store_false", dest="verbose", default=True,
+#                help="don't print status messages to stdout")
+parser.add_option ("-p", "--perm", dest="perm", action='store_true',
+                    help="Start all VMs marked as 'Permanent'")
+parser.add_option ("-d", "--down", dest="down", action='store_true',
+                    help="Shut Down all running VMs with 'system_powerdown'")
+parser.add_option ("-g", "--screengrab", dest="scrall", action='store_true',
+                    help="Perform screengrab on all running VMs")
+parser.add_option ("-s", "--setup", dest="command", action='store_const', const='setup',
+                    help=KvmServer.setup.__doc__)
+parser.add_option ("-x", "--sandboxes", dest="sbx", action='store_true',
+                    help="Start / cycle all marked sandbox VMs")
+#  parser.add_option ("-r", "--run", dest="runall", action='store_true',
+#                     help="Run all VMs so marked (NYI)")
+#  parser.add_option ("-k", "--kill", dest="killall", action='store_true',
+#                     help="Shutdown/kill all running VMs (NYI)")
+
+
+parser.add_option ("-a", "--ay", dest="command", action='store_const', const='ay',
+                    help="Aay")
+parser.add_option ("-b", "--bee", dest="command", action='store_const', const='bee',
+                    help="Aay")
+parser.add_option ("-c", "--cee", dest="command", action='store_const', const='cee',
+                    help="Cee")
+
+
+### Parse arguments, options, & commands
+
+(options, args) = parser.parse_args()
+
+if trace: print options, args
+
+vms = vms.values()  # _get_vm_list()
+
+
+### Status reporting
+
+print
+print 'DOWN VMs:'
+
+for vm in vms:
+    if not vm.up: print vm.mname
+
+print
+print 'UP VMs:'
+
+for vm in vms:
+    #if vm.up: print vm.mname, vm.screengrab(), 'done.'
+    if vm.up: print vm.mname
+
+print
+print 'Sandbox VMs:'
+
+for vm in vms:
+    if vm.sandbox: print vm.mname, int(vm.up)*'(Up)'
+
+print
+print 'Permanent VMs:'
+
+for vm in vms:
+    if vm.permanent: print vm.mname, int(vm.up)*'(Up)'
+
+
+### perform option-related commands
+
+if options.command == 'setup':
+    server.setup()
+
+if options.scrall:
+    print
+    print 'Screengrabbing up VMs:'
+
+    for vm in vms:
+        if vm.up: print vm.mname, ':', vm.screengrab(), 'done.'
+
+if options.sbx:
+    print
+    print 'Restarting / cycling running sandbox VMs:'
+
+    for vm in vms:
+        if vm.up and vm.sandbox:
+            print 'Running', vm.mname
+            print server.control_command (vm, 'restart')
+            print 'Done.'
+            print
+
+if options.perm:
+    print
+    print "Starting all (non-running) permanent VMs:"
+
+    for vm in vms:
+        if vm.permanent and not vm.up:
+            print 'Running:', vm.mname
+            print server.control_command (vm.mid, 'restart')
+            print 'Done.'
+            print
+
+if options.down:
+    print
+    print "Shutting Down all running VMs with 'system_powerdown':"  # should change to graceful
+
+    for vm in vms:
+        if vm.up:
+            print 'Stopping:', vm.mname
+            print vm.send ('system_powerdown')  # should change to 'graceful'
+
+if args:
+    num = len (args)
+    cmd = args [0].lower()
+    mid = args [1] if num >1 else None
+
+    if not mid:
+        mid = basename (getcwd())
+        if not mid.isdigit():
+            raise Exception, "Machine ID (mid) must be numeric:" + `mid`
+
+    if mid:
+        vm = _get_vm (mid)
+        if not (vm.is_valid() or cmd == 'deploy'):
+            raise Exception, "Invalid VM:" + `mid`
+    else:
+        raise Exception, "Machine ID (mid) required, or run from valid vm directory"
+
+    # still some work to do for add-on script fragments, like 'boot from rescue' etc
+    #print [short.split ('.') [0] for short, long in server.get_scripts()]
+
+    if cmd == 'start':
+        print server.start (mid)  #control_command (mid, 'start')
+    elif cmd == 'stop':
+        print server.graceful_stop (mid)  # control_command (mid, 'stop')  # synonym for graceful
+    elif cmd == 'graceful':
+        print server.graceful_stop (mid)  # control_command (mid, 'graceful')
+    elif cmd == 'restart':  # implies graceful - explicit stop/hard req'd otherwise
+        print server.restart (mid)  # control_command (mid, 'restart')
+    elif cmd == 'hard':
+        print server.hard_stop (mid)  # control_command (mid, 'hard')  # or 'kill'
+    elif cmd == 'status':
+        print server.control_command (mid, 'status')
+    elif cmd == 'cleanup':
+        print server.control_command (mid, 'cleanup')  # need to move stuff around to have non-parmed commands, 'ensure'
+    elif cmd == 'deploy':
+        print server.deploy (mid, mid, 'VM_' + mid)
+    else:
+        raise Exception, "Invalid VM command:" + cmd

@@ -1,0 +1,134 @@
+#!/bin/bash
+# createvm.sh - create a VM using Joe's Excellent vHosting framework (EVH Framework?!) for KVM, etc
+# copyright (c) 2007-14 Joseph J Wolff
+
+ubu=`lsb_release -cs`
+cwd=`pwd`
+
+usage() {
+ echo
+ echo "Usage: bash $0 mname [ubu] [arch] [ram] [hd]"
+ echo Notes:
+ echo "  mname should not contain spaces - use underscores, they will be displayed as spaces"
+ echo "  mname will be converted to the hostname, so you don't really have to append things"
+ echo "  ubu is the Ubuntu release - $ubu (default), saucy, raring, quantal, precise, maverick, lucid, karmic, jaunty, intrepid, hardy, etc"
+ echo "  arch is i386 (default) or amd64"
+ echo "  ram is in MB (default 256)"
+ echo "  hd is in GB (default 20)"
+ echo
+ echo parms: $1 $2 $3 $4 $5
+ exit 1
+}
+
+mname=$1
+if [[ $2 ]]; then ubu=$2;  else ubu=$ubu; fi
+if [[ $3 ]]; then arch=$3; else arch=i386; fi
+if [[ $4 ]]; then ram=$4;  else ram=256; fi
+if [[ $5 ]]; then hd=$5;   else hd=20; fi
+
+if ! [[ $mname ]]; then
+ echo vMachine Name must be specified
+ usage
+fi
+
+dir=$mname.$ubu.$arch.$ram.$hd
+
+# JJW 3/22/09 this works, flesh out for other deps like satchmo, etc
+. extrapkgs.sh
+
+echo
+echo Destination: `pwd`/$dir
+echo vMachine Name: $mname
+echo Ubuntu: $ubu
+echo Architecture: $arch
+echo Ram: $ram
+echo HD: $hd
+echo Extras: $extra
+echo
+
+### beginning of former fixed-parm createvm
+mem=$ram
+
+#pw=`dd if=/dev/random bs=6 count=1 | base64`
+pw=libre142857 #guest$ip
+echo YOUR PASSWORD IS $pw - echo PLEASE MAKE A NOTE OF IT
+
+hname=`echo $mname | sed 's/_/-/g' | tr [:upper:] [:lower:]`
+echo Hostname: $hname
+
+# --addpkg linux-image-virtual necessary, see: https://bugs.launchpad.net/ubuntu/+source/vm-builder/+bug/1037607
+
+sudo vmbuilder kvm ubuntu \
+  --suite $ubu \
+  --flavour virtual \
+  --mem $mem -a $arch -d $dir \
+  --rootsize $(( 1074*$hd )) \
+  --domain eracks.com \
+  --hostname $hname \
+  --user sysadmin --name "Libre System Administrator" --pass $pw \
+  --ssh-key auth_keys \
+  --ssh-user-key auth_keys \
+  --timezone=PST8PDT \
+  --components main,universe,restricted,multiverse \
+  --libvirt qemu:///system \
+  --addpkg linux-virtual \
+  --addpkg mc \
+  --addpkg curl \
+  --addpkg wget \
+  --addpkg ssh \
+  --addpkg rsync \
+  --addpkg rzip \
+  --addpkg p7zip-full \
+  --addpkg rar \
+  --addpkg unrar \
+  --addpkg zip \
+  --addpkg unzip \
+  --addpkg arj \
+  --addpkg lzma \
+  --addpkg lynx \
+  --addpkg man-db \
+  --addpkg locate \
+  --addpkg subversion \
+  --addpkg git-core \
+  --addpkg mercurial \
+  --addpkg postfix \
+  --addpkg heirloom-mailx \
+  --addpkg man-db \
+  --addpkg libmagic1 \
+  --firstboot $cwd/firstboot.sh \
+  --firstlogin $cwd/firstlogin.sh \
+  $extra \
+  2>&1 | tee createvm.log
+
+#  --addpkg chef \
+
+# causes fault 4/30/11:
+#  --manifest /root/vmbuilder-manifest.txt \
+
+#  --user joe --name "Joseph Wolff" --pass $pw \
+
+# new lucid vmbuilder FUBAR - man page says these are there, but they arent:
+# JJW 4/30/11 let's try it with Natty Narwahl
+#  --firstboot firstboot.sh \
+#  --firstlogin firstlogin.sh \
+
+#  --addpkg /vm/scripts/createvm/atboot.deb \
+#  --exec "/vm/scripts/createvm/inguest.sh" \
+
+# partner doesn't seem to work 11/20/08 JJW:
+#  --components main,universe,restricted,multiverse,partner \
+
+#  --components main,universe,medibuntu,partner \
+#  --addpkg xubuntu-desktop \
+#  --addpkg lzma \
+#  --addpkg rar \
+
+sleep 1
+sudo cp createvm.log $dir/
+sudo chown -R www-data:kvm $dir
+
+#scp -r $dir librehost.com:/vm/
+scp -r $dir joe@216.172.133.2:/vm/
+# should copy to vm dir, rename to $name
+
+echo YOUR PASSWORD IS $pw - PLEASE MAKE A NOTE OF IT

@@ -1,0 +1,20 @@
+======================
+inotifyx Release Notes
+======================
+
+.. contents::
+
+
+inotifyx 0.1.1 2009-10-18
+=========================
+
+ * Fix integer truncation of timeout argument in get_events.  Thanks to Eric
+   Firing for the report and patch.
+   (Forest Bond)
+
+
+inotifyx 0.1.0 2009-04-26
+=========================
+
+ * Initial release.
+   (Forest Bond)

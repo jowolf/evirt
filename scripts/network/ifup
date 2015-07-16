@@ -1,0 +1,5 @@
+echo In evirt/scripts/network/ifup, adding: $1 for `whoami`
+#sudo tunctl -u `whoami` -t $1
+sudo ifconfig $1 up
+sudo brctl addif br0 $1
+

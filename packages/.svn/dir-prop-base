@@ -1,0 +1,11 @@
+K 13
+svn:externals
+V 54
+http://jsonrpclib.googlecode.com/svn/trunk jsonrpclib
+
+K 10
+svn:ignore
+V 17
+*~\n*.pyc\n*.tmp
+
+END
