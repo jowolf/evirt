@@ -15,7 +15,8 @@ gateway = '184.105.215.1'
 network = '184.105.215.0'
 subnet_mask =  '255.255.255.0'
 
-mac_prefix = 'de:ad:be:ef:'
+#mac_prefix = 'de:ad:be:ef:'
+mac_prefix = 'de:ad:be:ad:'  # JJW 5/15/16 for arp collision with 133 on 8 - BUT this isn't used! :-/
 
 hosts = (
     #"https://localhost:8000",
