@@ -1,0 +1,149 @@
+6/1/18 obsos & notes:
+- added workdir: .evirt to declarations
+- could have multiple actions
+- idea: tag sections as commands, build help & argparse
+- need to build input parms to start.sh
+keep log in .evirt of commands as executed, but keep out of main dir
+status should tail logs
+break out input parms builder into separate module, as it's part of the
+  project bsx rules, not the engine - ?  Or just inherit from generic class?
+
+- 9p: I get it - 2-passes (like compiler) - process, including tags/commands, then do one
+
+- 10p: how about line-at-a-time template repl on decls, instead of parms fn -
+
+
+5/11/2018:
+
+idea / breakthru:
+
+list of acceptable (Section) class commands can change as you descend -
+
+Provides context - like a compiler, and separates syntax fm semantics
+
+- - -
+
+notes from ev.py:
+
+
+'''
+d - set up ~5 structs
+
+so WTF is the WFL?
+- edit ev.yaml
+- spinup (or make_new_vm)
+- download?
+- start/stop (or up/down?)
+- status
+- log?
+- delete / spindown
+- swap cmds?
+- launch sftp into fs
+- monitor (telnets to port)
+- access - spice/rdp/vnc commands to cut/paste
+- ssh - do it and/or cut/paste
+
+Isn't this getting a lot like vagrant?
+
+Proposal: as a rest lib:
+- no parm, process all as save
+- cmd, match to section with dependencies
+
+
+
+Q's:  is evm start ok? Or should we have the generated scripts in the dir?
+
+- idea: versions file, w/triple: int date md5 - autoinc one for int, if date/hash same no need to gen
+
+- idea: build keys subdict from keys/ subfolder, insert into dict manually before saving
+
+  actions:
+    save: .
+    addkeys: ./keys/
+  actions:
+    save: ..
+    do: sh
+
+
+  # evm commands:
+  # start stop status spinup(1st time) download(image) service/rescue(boot fm rescuecd) delete
+  # backup? snapshot? web intf?
+  # anything that destroys data like delete or spinup, should ask 1st (and maybe move to /old)
+  # 'spinup' is preferred over 'create' - create wouldn't do much except dl and cloud-localds, I guess, without running the subsequent script
+
+really need 'show script' capability, esp for legacy evirt :-)
+
+resultant start/stop scripts are way simpler, and new arch wil be even more so
+
+- mk .ev-work dir
+- cd to it
+- save all the files
+- run make-new-vm or just cloud_localds
+
+- mv the resultant vm, and generated custom start/stop/restart scripts (swap?) into the parent dir
+- no need for parms any more
+
+start
+stop
+restart
+gen (or work)
+make or init
+spinup - renames & makes 2 backups
+delete - or spindown
+
+- run/call evmanager spinup, but be sure to pass the cloudinit parms drive on 1st invocation!
+
+I guess:
+- evm create can make all the files and do cloud-localds
+- evm spinup can just run parms.sh but with the extra parm(s) for the cloudinit HD
+- evm start/stop is regular / normal
+
+
+- - -
+
+circa april:
+
+ 2014  virtualenv -p python3 env
+ 2015  ./go.sh
+ 2016  . env/bin/activate
+ 2017  pip -V
+ 2018  history |tail >notes.txt
+
+
+- - -
+
+leftover dependencies BS:
+
+(env) joe@lgram:~/evirt/new$ pip install yaml-1.3
+Collecting yaml-1.3
+  Downloading https://files.pythonhosted.org/packages/0c/7d/9f085bbc9e209336d2849372472786698dff2371004b147a1ad4e4c52470/yaml_1.3-0.1.0-py3-none-any.whl
+Collecting ruamel.std.argparse>=0.8 (from yaml-1.3)
+  Downloading https://files.pythonhosted.org/packages/7e/f1/4148b62a1f92c5d7a46eb79046bcbf11be3c419f64677b12c3cac3b5ab9e/ruamel.std.argparse-0.8.1-py2.py3-none-any.whl
+Collecting ruamel.appconfig (from yaml-1.3)
+  Downloading https://files.pythonhosted.org/packages/5a/d1/e1c0dd10b2bff60ff3abb0ee8a370cb4951f0ad996b6289c0a4ba267f210/ruamel.appconfig-0.5.3-py2.py3-none-any.whl
+Installing collected packages: ruamel.std.argparse, ruamel.appconfig, yaml-1.3
+Successfully installed ruamel.appconfig-0.5.3 ruamel.std.argparse-0.8.1 yaml-1.3-0.1.0
+(env) joe@lgram:~/evirt/new$ pip show yaml-1.3
+Name: yaml-1.3
+Version: 0.1.0
+Summary: next YAML parser
+Home-page: https://bitbucket.org/ruamel/yaml_1.3
+Author: Anthon van der Neut
+Author-email: a.van.der.neut@ruamel.eu
+License: Copyright Ruamel bvba 2007-2017
+Location: /home/joe/evirt/new/env/lib/python3.5/site-packages
+Requires: ruamel.std.argparse, ruamel.appconfig
+Required-by:
+(env) joe@lgram:~/evirt/new$ ./ev.py
+Traceback (most recent call last):
+  File "./ev.py", line 3, in <module>
+    import yaml
+ImportError: No module named 'yaml'
+(env) joe@lgram:~/evirt/new$ pip uninstall yaml-1.3
+Uninstalling yaml-1.3-0.1.0:
+  Would remove:
+    /home/joe/evirt/new/env/bin/yaml_1_3
+    /home/joe/evirt/new/env/lib/python3.5/site-packages/yaml_1.3-0.1.0-py3.6-nspkg.pth
+    /home/joe/evirt/new/env/lib/python3.5/site-packages/yaml_1.3-0.1.0.dist-info/*
+    /home/joe/evirt/new/env/lib/python3.5/site-packages/yaml_1/3/*
+Proceed (y/n)?

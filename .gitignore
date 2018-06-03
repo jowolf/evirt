@@ -1,6 +1,8 @@
 # JJW additions:
 *~
 scripts/createvm/eRacks*.50
+*.img
+new/env/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
