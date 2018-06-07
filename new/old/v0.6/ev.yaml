@@ -14,17 +14,14 @@ ram: 4G
 workdir: .evirt
 # new incremental replacement decls:
 #iplast: decls.get ('iplast', int(os.path.basename(os.getcwd())))  # last tumbler of IP4 address
-#macaddr: eval "de:ad:be:ef:%02d:%02d" % (iplast / 100, iplast % 100)
-#net:     eval "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast)
-#vncport: eval 59000 + iplast - 5900
-#monport: eval 23000 + iplast
-#mon:     eval "-monitor telnet:127.0.0.1:%s,server,nowait,nodelay" % monport
-#vnc:     eval "-vnc :%s" % vncport
+macaddr: eval "de:ad:be:ef:%02d:%02d" % (iplast / 100, iplast % 100)
+net:     eval "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast)
+vncport: eval 59000 + iplast - 5900
+monport: eval 23000 + iplast
+mon:     eval "-monitor telnet:127.0.0.1:%s,server,nowait,nodelay" % monport
+vnc:     eval "-vnc :%s" % vncport
 #rdpport = decls.get ('rdpport', 39000 + iplast)
-files:
-  - /home/joe/eracks11/conf/docker-compose.yml
-  #- .ssh/id_rsa_jjw
-  #- .ssh/id_rsa_eracks
+
 ---
 section: userdata.yaml
 action:
@@ -230,7 +227,6 @@ content: |
         ./deploy.sh prod
         # move db blast to here
         # call salt fm here for at least staging, prod
-    $file1$file2$file3
   runcmd:
     - cd /root
     - echo RUNNING RUNCMD SCRIPT
@@ -270,11 +266,9 @@ content: |
 ---
 section: start.sh
 action:
-  command:
-    start:
-        help: Start the VM
+  save: $workdir
 content: |
-  # start.sh generated $date by eVirt
+  # start.sh generated mm/dd/yy by eVirt
   log=daemon.log
   vmdir = vmname if vmname else basename (pwd)
   daemon="daemon -D /vm/$vmdir/ -P /vm/ -n $vmname $respawn -o $log -l $log --verbose -- "
@@ -282,11 +276,9 @@ content: |
 ---
 section: stop.sh
 action:
-  command:
-    stop:
-        help: Stop the VM
+  save: $workdir
 content: |
-  # stop.sh generated $date by eVirt
+  # stop.sh generated mm/dd/yy $date by eVirt
   echo Stopping $mname daemon...
   daemon --stop --verbose -n $mname -P /vm/
 
@@ -301,56 +293,11 @@ content: |
   #sudo ifconfig br0:$ip 216.218.243.$ip netmask 255.255.255.255
 
   echo Done with $0 $mname
----
-section: status.sh
-action:
-  command:
-    status:
-        help: Show the status of the VM
-content: |
-  # status.sh generated $date by eVirt
-  echo Daemon log:
-  echo
-  tail daemon.log
-  echo
-  echo eVirt log:
-  echo
-  tail evirt.log
-  echo
-  echo sudo ps -axw | grep $vmname
-  sudo ps -axw | grep $vmname
----
-section: build.sh
-action:
-  command:
-    build:
-        help: Build / make new VM from ev.yaml using cloud-init, userdata, metadata, and declarations.
-        #metavar: make-new-vm
 
-    #description: Manipulate VMs defined by ev.yaml
-    #options:
-    #    make_new_vm:
-    #        action: store_const
-    #        const: __SUM__
-    #        default: __MAX__
-    #        help: "sum the integers (default: find the max)."
-    #args:
-    #subparsers:
-    #    make_new_vm: # thecommand:
-            #metavar: make-new-vm
-    #        help: Make new VM from ev.yaml using cloud-init (userdata, metadata, and declarations).
-            #nargs: 1  # '?'
-    #    foo:
-    #        help: foo help
-    #    bar:
-    #        help: bar help
-
-    #    integers:
-    #        metavar: N
-    #        type: int
-    #        nargs: +
-    #        help: an integer for the accumulator
-  #do: sh
+---
+section: make_new_vm.sh
+action:
+  do: sh
 content: |
   # copy or download image & save as $vmname.img
   if ( ls -l $vmname.img ); then

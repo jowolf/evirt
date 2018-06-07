@@ -1,4 +1,4 @@
-# stop.sh generated mm/dd/yy $date by eVirt
+# stop.sh generated 2018-06-06 by eVirt
 echo Stopping $mname daemon...
 daemon --stop --verbose -n $mname -P /vm/
 

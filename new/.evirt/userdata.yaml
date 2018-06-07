@@ -198,6 +198,112 @@ write_files:
       ./deploy.sh prod
       # move db blast to here
       # call salt fm here for at least staging, prod
+  - path: /home/joe/eracks11/conf/docker-compose.yml
+    content: |
+      # JJW 3/8/18 - chg to yaml version 2
+      
+      version: "2.1"
+      
+      services:
+        web:
+          hostname: localdev
+          restart: always
+          build: .
+          environment:
+            TZ: "America/Los_Angeles" # offset = -08:00 / DST -07:00
+            DATABASE_URL: postgres://eracks:Wav3lets9@postgres/eracksdb
+          expose:
+            - 8000
+          ports:
+            - 8000:8000
+            - 8080:8080
+          links:
+            - postgres:postgres
+            - memcache:memcache
+            #- nginx:nginx
+            #- redis:redis
+          depends_on:
+            postgres:
+                condition: service_healthy
+            memcache:
+                condition: service_started
+            #- redis
+          volumes:
+            - ../:/home/joe/eracks11
+            #- /usr/src/app
+            #- /usr/src/app/static
+          working_dir: /home/joe/eracks11
+      
+          #env_file: .env
+          #command: /usr/local/bin/gunicorn docker_django.wsgi:application -w 2 -b :8000
+          #command: /usr/bin/python /home/joe/eracks11/manage.py runserver 0:8000
+          #command: /home/joe/eracks11/manage.py runserver 0:8000
+          #command: sudo netstat -antp
+          #command: ["cd /home/joe/eracks11/ && python manage.py runserver 0.0.0.0:8000"]
+          #entrypoint: ["bash", "ls", "-l"]
+          #entrypoint: /usr/bin/python
+          #command: ["pwd", "cd", "/home/joe/eracks11", "pwd", "./manage.py", "runserver", "0:8000"]
+      
+          entrypoint: ./conf/docker-entrypoint.sh
+          command: ["./manage.py", "runserver", "0:8000"]
+      
+        nginx:
+          restart: always
+          image: nginx:latest
+          ports:
+            - 80:80
+            - 443:443
+          volumes:
+            - /www/static
+            - ./etc/nginx.conf:/etc/nginx.conf
+          volumes_from:
+            - web
+          links:
+            - web:web
+      
+        postgres:
+          environment:
+            POSTGRES_DB: eracksdb
+            POSTGRES_USER: eracks
+            POSTGRES_PASSWORD: Wav3lets9
+          restart: always
+          image: postgres:alpine
+          #image: postgres:latest
+          healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U eracks -d eracksdb"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
+          expose:
+            - 5432
+          #ports:
+          #  - 5432:5432
+          #volumes:
+          #  - pgdata:/var/lib/postgresql/data/
+          #links:
+          #  - web:web
+      
+        # add alpine-cron instance here
+        # to back stuff up
+        # https://devopsheaven.com/cron/docker/alpine/linux/2017/10/30/run-cron-docker-alpine.html
+      
+        memcache:
+          restart: always
+          image: memcached:alpine
+          expose:
+            - 11211
+          ports:
+            - 11211:11211
+      
+        # Nija never even changed the settings to use this, much less the dashboard or sessions:
+        #redis:
+        #  restart: always
+        #  image: redis:latest
+        #  expose:
+        #    - 6379
+        #  #volumes:
+        #  #  - redisdata:/data
+
 runcmd:
   - cd /root
   - echo RUNNING RUNCMD SCRIPT

@@ -2,7 +2,7 @@
 
 #/usr/bin/python
 
-import datetime, os
+import os
 # does not preserve order, nor formatting: import yaml
 # not needed, use rt loader - import yamlordereddictloader
 
@@ -14,44 +14,22 @@ from string import Template
 #from collections import OrderedDict
 import clg
 
-trace = 1  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args
-
+trace = 1
 #declarations = {}  # done dynamically
+
 
 ## Classes
 
 class Section (object):
-    _sections = []
-    _commands = dict (
-        description = 'Command & control for Linux KVM (Kernel Virtual Machine) VMs as defined in ev.yaml',
-        help        = 'Command & control for Linux KVM (Kernel Virtual Machine) VMs as defined in ev.yaml',
-        subparsers = {},
-    )
-    if trace & 8: print ('COMMANDS', _commands)
-
     def __init__ (self, data):
         # This must be first before other vars are declared :-)
-        self.actions = [ a for a in dir (self) if not a.startswith ('_') ] # should be a class init
+        self.actions = [ a for a in dir (self) if not a.startswith ('_') ]
+        if trace: print (self.actions)
+
         self.data = data
         self.name = data.pop ('section')
         self.action = data.pop ('action')
-        self._sections += [self]
-        if trace & 4:
-            print ('ACTIONS', self.actions)
-            print ('ACTION', self.action)
-            print ('SECTIONS', self._sections)
-
-    # class function
-    def _parse():
-        cmd  = clg.CommandLine (Section._commands)
-        args = cmd.parse()
-        if trace & 8: print ('ARGS:', args)
-        return args
-
-    def _match (self, args):
-        cmd_name = self.name.split ('.') [0]
-        if trace & 8: print ('COMMAND', args.command0, cmd_name)  #os.path.basename(self.name))
-        return args.command0 == cmd_name
+        if trace: print (self.action)
 
     def _content (self):
         content = self.data ['content'] if 'content' in self.data else yaml.dump (self.data, Dumper=yaml.RoundTripDumper)
@@ -62,7 +40,7 @@ class Section (object):
         fn, parm = list (self.action.items()) [0]
         assert fn in self.actions
         fn = self.__getattribute__(fn)
-        if trace & 4: print ('FUNCTION', fn)
+        if trace: print (fn)
         fn (parm)
 
     def _parms (self, decls):
@@ -70,9 +48,10 @@ class Section (object):
         Build parms from declarations for start, stop, monitor, etc - ports, etc -
         Could break out into sep module or inh class for bsx rules
         '''
-        if trace & 2: print ('DECLS:', decls)
+        print (decls)
 
         iplast  = decls.get ('iplast') if 'iplast' in decls else int (os.path.basename (os.getcwd()))  # last tumbler of IP4 address
+        print (iplast)
         macaddr = decls.get ("de:ad:be:ef:%02d:%02d" % ((iplast / 100), (iplast % 100)))
         net     = decls.get ('net', "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast))
         vncport = decls.get ('vncport', (59000 + iplast - 5900))
@@ -90,7 +69,6 @@ class Section (object):
             mon     = mon,
             vnc     = vnc,
             rdpport = rdpport,
-            date    = datetime.date.today().isoformat(),
 
             # could do touch here, or python symlink: ln -s /vm/$ip /vm/$mname >& /dev/null
             #  or ln -s /vm/$ip /vm/$ip/$mname >& /dev/null
@@ -98,23 +76,6 @@ class Section (object):
         )
 
         decls.update (ud)
-
-        # add files
-
-        for n,f in enumerate (decls ['files']):
-            #print (f)
-            #print ('file%d' % (n+1))
-            decls ['file%d' % (n+1)] =   \
-                 ("- path: %s\n" % f)  + \
-              "    content: |\n"     + \
-              ''.join ([('      ' + lin) for lin in open(f)])
-        # so that the embedded dest in the existing yaml looks like this, with a current indent of 4:
-        #$file1
-        # ...
-
-        decls ['file2'] = ''
-        decls ['file3'] = ''
-
         return decls
 
         '''
@@ -142,7 +103,7 @@ class Section (object):
         assert 'workdir' in declarations
         reldir = Template (reldir).safe_substitute (declarations)
         path = os.path.join (reldir, self.name)
-        if trace: print ('Saving', path)
+        print ('Saving', path)
         os.makedirs (reldir, exist_ok=True)
         open (path, 'w').write (self._content())
 
@@ -151,19 +112,31 @@ class Section (object):
         globals() [var] = self.data
         self._parms (declarations)
 
-    def do (self, shell='bash'):
-        assert shell == 'bash'
-        from sh import bash
-        cmd = shell + ' -c ' + self._content()
-        if trace: print ('RUNNING:', cmd)
-        #'sh ('-c', 'echo "RUNNING" %s &&' % ))
-        print (bash ('-c', self._content()))
+        #globals() [var] = {}  # so 'declarations' is there now, but empty
+        #for k,v in self.data.items():
+        #    print (k,v)
+        #    if isinstance (v, str):
+        #        if v.startswith ('eval '):
+        #            #declarations [k] = eval (v[5:], locals = declarations)  # sntx: no keyword agrs, despite docs saying so
+        #            declarations [k] = eval (v[5:], None, declarations)
+        #        else:
+        #            declarations [k] = Template (v).safe_substitute (declarations)
+        #    else:
+        #        declarations [k] = v
+        #    print (k, declarations[k])
+
+    def do (self, shell):
+        assert shell == 'sh'
+        from sh import sh
+        print (sh ('-c', 'echo "RUNNING" %s &&' % shell + self._content()))
 
     def command (self, more):
-        "Save file & add command to argparse list"
-        self.save (declarations ['workdir'])
-        self._commands ['subparsers'].update (more)
-
+        cmd = clg.CommandLine (more)
+        args = cmd.parse()
+        print (args)  #, args.integers)
+        print (args.command0, os.path.basename(self.name))
+        if args.command0 == os.path.basename(self.name):
+            self.do ('sh')
 
 ## Main
 
@@ -179,14 +152,8 @@ docs = [d for d in g]
 
 if trace & 2:
     for d in docs:
-        print ('DOC:', pformat (d))
-        print ('DOCS LEN', len (docs))
+        print (pformat (d))
+    print ('LEN', len (docs))
 
 for d in docs:
-    Section (d)._process()
-
-args = Section._parse()
-
-for s in Section._sections:
-    if s._match (args):
-        s.do()
+  Section (d)._process()
