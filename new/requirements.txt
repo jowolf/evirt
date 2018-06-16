@@ -1,3 +1,9 @@
+# apt requirements: n daemon,
+# kvm, qemu and utils, spicec, rdp? vnc/remmina?
+# libguestfs-tools
+
+# sudo adduser joe kvm
+
 ruamel.yaml
 #yamlordereddictloader
 clg

@@ -14,7 +14,7 @@ from string import Template
 #from collections import OrderedDict
 import clg
 
-trace = 1  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args
+trace = 16  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
 
 #declarations = {}  # done dynamically
 
@@ -72,8 +72,23 @@ class Section (object):
         '''
         if trace & 2: print ('DECLS:', decls)
 
+        #-drive file=boot-disk.img,if=virtio \
+        #-drive file=seed.iso,if=virtio
+
+        hda     = decls.get ('hda') or decls ['vmname'] + '.img'
+        #hdb     = decls.get ('hdb') or "-hdb %s" % os.path.join (decls ['workdir'], 'cloudinit.qc2')
+        hdb     = decls.get ('hdb') or os.path.join (decls ['workdir'], 'cloudinit.qc2')
+        hdc     = decls.get ('hdc')
+        hdd     = decls.get ('hdd')
+
+        drives  = "-drive file=%s,if=virtio " % hda
+        if hdb: drives += "-drive file=%s,if=virtio " % hdb
+        if hdc: drives += "-drive file=%s,if=virtio " % hdc
+        if hdd: drives += "-drive file=%s,if=virtio " % hdd
+
+        vmdir   = decls.get ('vmdir') or os.getcwd()
         iplast  = decls.get ('iplast') if 'iplast' in decls else int (os.path.basename (os.getcwd()))  # last tumbler of IP4 address
-        macaddr = decls.get ("de:ad:be:ef:%02d:%02d" % ((iplast / 100), (iplast % 100)))
+        macaddr = decls.get ('macaddr', "de:ad:be:ef:%02d:%02d" % ((iplast / 100), (iplast % 100)))
         net     = decls.get ('net', "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast))
         vncport = decls.get ('vncport', (59000 + iplast - 5900))
         monport = decls.get ('monport', (23000 + iplast))
@@ -82,6 +97,12 @@ class Section (object):
         rdpport = decls.get ('rdpport', (39000 + iplast))
 
         ud = dict (
+            hda     = hda,
+            hdb     = hdb,
+            hdc     = hdc,
+            hdd     = hdd,
+            drives  = drives,
+            vmdir   = vmdir,
             iplast  = iplast,
             macaddr = macaddr,
             net     = net,
@@ -90,13 +111,15 @@ class Section (object):
             mon     = mon,
             vnc     = vnc,
             rdpport = rdpport,
-            date    = datetime.date.today().isoformat(),
+            #date    = datetime.date.today().isoformat(),
+            date    = datetime.datetime.today().ctime(),
 
             # could do touch here, or python symlink: ln -s /vm/$ip /vm/$mname >& /dev/null
             #  or ln -s /vm/$ip /vm/$ip/$mname >& /dev/null
             # same for rdpport, vncport, spiceport, ?
         )
 
+        if trace & 16: print ('UPDATE', ud)
         decls.update (ud)
 
         # add files
@@ -116,25 +139,6 @@ class Section (object):
         decls ['file3'] = ''
 
         return decls
-
-        '''
-        other param examples:
-        if [[ $sandbox ]]; then snapshot=1; fi
-
-        if ! [[ $k ]];   then k=en-us; fi
-        parms="$parms -k $k"
-
-        if [[ $tablet ]];   then parms="$parms -usbdevice tablet"; fi
-        if [[ $snapshot ]]; then parms="$parms -snapshot"; fi
-        if [[ $boot ]];     then parms="$parms -boot $boot"; fi
-        if [[ $cdrom ]];    then parms="$parms -cdrom $cdrom"; fi
-        if [[ $hdb ]];      then parms="$parms -hdb $hdb"; fi
-        if [[ $hdc ]];      then parms="$parms -hdc $hdc"; fi
-        if [[ $hdd ]];      then parms="$parms -hdd $hdd"; fi
-        if [[ $m ]];        then parms="$parms -m $m"; fi
-
-        if [[ $respawn ]];  then respawn="-r"; fi
-        '''
 
     def save (self, reldir):
         assert '..' not in reldir
