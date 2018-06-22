@@ -1,3 +1,14 @@
+6/22/18
+new/ folder has new yaml-based implementation - most or all of the rest is no longer used
+- cloud images are used instead of vm-builder
+- cloud-init is used for bootstrapping
+- salt support is there, but not required
+- other cmdline features added
+- much greater flexibility with new python / yaml / bash architecture
+- multi-host capabilities and libraries NYI for now in new version
+- django REST planned / designed in
+
+
 7/16/15
 According to django-grids, the most active & popular django REST framework is, er, django_REST_framework :)
 So move away from Piston and (TastyPie)

@@ -1,3 +1,18 @@
+6/17/18 JJW
+check out:
+apt show qemu-guest-agent
+for inside the guest - coordinate backups, shutdown, snapshots, etc
+
+Todo:
+- add Atom to setup?
+- address different names for salt/er deploy keys
+- err msg if injected file not present
+- find studio pub key
+
+get nextcloud up and running! WP!
+
+
+
 6/1/18 obsos & notes:
 - added workdir: .evirt to declarations
 - could have multiple actions

@@ -38,7 +38,8 @@ workdir: .evirt
 #rdpport = decls.get ('rdpport', 39000 + iplast)
 
 git_repo: git@github.com:jowolf/jjw-salt-master.git
-git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
+#git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
+git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
 
 #Todo:
 #salted: False
@@ -46,7 +47,7 @@ git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
 
 files:
   # same as git_repo_key, above:
-  - /home/joe/.ssh/id_rsa_jjw-salt-deploy
+  - /home/joe/.ssh/jjw-salt-deploy.id_rsa
   - /home/joe/eracks11/conf/docker-compose.yml
   #- .ssh/id_rsa_jjw
   #- .ssh/id_rsa_eracks
@@ -419,3 +420,17 @@ content: |
   cloud-localds $workdir/cloudinit.img $workdir/userdata.yaml # $workdir/metadata.yaml
   qemu-img convert -O qcow2 -c .evirt/cloudinit.img .evirt/cloudinit.qc2
   #qemu-img convert -O qcow2 -c $vmname.img $vmname.qc2
+---
+section: setup.sh
+action:
+  command:
+    setup:
+        help: Set up new vm dir with ev.yaml example, .evirt workdir & scripts
+content: |
+  # copy ev.yaml fropm install dir
+   if ( ls -l ev.yaml ); then
+    echo EV.YAML ALREADY PRESENT - NOT OVERWRITING!
+  else
+    # copy from install location:
+    cp `dirname $0` $vmname.img
+  fi
