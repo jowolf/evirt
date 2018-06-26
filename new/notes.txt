@@ -1,3 +1,19 @@
+6/25/18 See Public Bridge Section, here:
+https://www.linux-kvm.org/page/Networking
+
+- permission issues: 
+chown :joe /dev/net/tun
+
+n edit /etc/qemu-ifup
+customize start.sh w/sudo, new sntx
+
+forwarding? already on
+
+iptables? yes:
+sudo iptables -P FORWARD ACCEPT
+
+
+
 6/17/18 JJW
 check out:
 apt show qemu-guest-agent

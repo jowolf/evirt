@@ -1,0 +1,10 @@
+# example docker compaise file
+
+version: '3'
+
+services:
+    hello-world:
+    image: tutum/hello-world
+    restart: always
+    ports:
+        - 8080:80

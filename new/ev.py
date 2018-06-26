@@ -14,7 +14,7 @@ from string import Template
 #from collections import OrderedDict
 import clg
 
-trace = 16  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
+trace = 0 #16  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
 
 #declarations = {}  # done dynamically
 
@@ -75,9 +75,13 @@ class Section (object):
         #-drive file=boot-disk.img,if=virtio \
         #-drive file=seed.iso,if=virtio
 
-        hda     = decls.get ('hda') or decls ['vmname'] + '.img'
-        #hdb     = decls.get ('hdb') or "-hdb %s" % os.path.join (decls ['workdir'], 'cloudinit.qc2')
-        hdb     = decls.get ('hdb') or os.path.join (decls ['workdir'], 'cloudinit.qc2')
+        # Note: the 'or' sntx does not allow for blank decls, while the 'get' sntx does
+
+        workdir = decls.get ('workdir') or '.evirt'
+
+        hda     = decls.get ('hda') or decls ['vmname'] + '.' + decls.get ('ext', 'img')
+        #hdb     = decls.get ('hdb') or "-hdb %s" % os.path.join (workdir, 'cloudinit.qc2')
+        hdb     = decls.get ('hdb', os.path.join (workdir, 'cloudinit.qc2'))
         hdc     = decls.get ('hdc')
         hdd     = decls.get ('hdd')
 
@@ -89,7 +93,13 @@ class Section (object):
         vmdir   = decls.get ('vmdir') or os.getcwd()
         iplast  = decls.get ('iplast') if 'iplast' in decls else int (os.path.basename (os.getcwd()))  # last tumbler of IP4 address
         macaddr = decls.get ('macaddr', "de:ad:be:ef:%02d:%02d" % ((iplast / 100), (iplast % 100)))
-        net     = decls.get ('net', "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast))
+        #net     = decls.get ('net', "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast))
+        #net     = decls.get ('net', "-net nic,macaddr=%s -net tap,ifname=tap-%s,helper=/etc/qemu-ifup,downscript=no" % (macaddr, iplast))
+        #net     = decls.get ('net', "-net nic,macaddr=%s -net tap,helper=/etc/qemu-ifup" % macaddr)
+        #net     = decls.get ('net')
+        net     = decls.get ('net',
+                             "-device virtio-net,netdev=net0,mac=%s -netdev tap,id=net0,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast))
+
         vncport = decls.get ('vncport', (59000 + iplast - 5900))
         monport = decls.get ('monport', (23000 + iplast))
         mon     = decls.get ('mon', "-monitor telnet:127.0.0.1:%s,server,nowait,nodelay" % monport)
@@ -97,6 +107,7 @@ class Section (object):
         rdpport = decls.get ('rdpport', (39000 + iplast))
 
         ud = dict (
+            workdir = workdir,
             hda     = hda,
             hdb     = hdb,
             hdc     = hdc,
@@ -124,16 +135,19 @@ class Section (object):
 
         # add files
 
-        for n,f in enumerate (decls ['files']):
+        if decls.get ('files'):
+          for n,f in enumerate (decls ['files']):
             #print (f)
             #print ('file%d' % (n+1))
             decls ['file%d' % (n+1)] =   \
                  ("- path: %s\n" % f)  + \
               "    content: |\n"     + \
               ''.join ([('      ' + lin) for lin in open(f)])
-        # so that the embedded dest in the existing yaml looks like this, with a current indent of 4:
-        #$file1
-        # ...
+              # so that the embedded dest in the existing yaml looks like this, with a current indent of 4:
+              #$file1
+              # ...
+        else:
+            decls ['file1'] = ''
 
         decls ['file2'] = ''
         decls ['file3'] = ''

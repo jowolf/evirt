@@ -6,12 +6,13 @@ sudo apt install 	\
     qemu-utils 		\
     spice-client-gtk 	\
     spice-html5 	\
-    remmina-plugin-spice \
     rdesktop		\
     vinagre		\
     libguestfs-tools	\
     cloud-image-utils	\
 
+# NFG for 16.04:
+#    remmina-plugin-spice \
 
 # Also other rdp clients
 # Also other vnc clients - xtightvncviewer, xvnc4viewer
