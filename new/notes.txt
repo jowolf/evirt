@@ -1,3 +1,9 @@
+6/23
+rescue or boot cmd to boot from cd image
+default command - list running vms
+add $user, $installdir, and $cwd (tricky, could be vm or install dir) in addition to $date
+htop, alpine, mosh
+
 6/17/18 JJW
 check out:
 apt show qemu-guest-agent

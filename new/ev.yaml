@@ -11,7 +11,8 @@ permanent: True
 size: 20G
 ram: 2G
 # for local, no need for net / IP address / Macaddr
-net: "-net nic -net user,hostfwd=tcp::2222-:22"
+#net: "-net nic -net user,hostfwd=tcp::2222-:22"
+net: "-netdev user,id=nic1,hostfwd=tcp::2222-:22 -device virtio-net,netdev=nic1"
 vnc: ""
 #parms: -vga vmware
 #parms: -k en-us
@@ -48,7 +49,9 @@ git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
 files:
   # same as git_repo_key, above:
   - /home/joe/.ssh/jjw-salt-deploy.id_rsa
-  - /home/joe/eracks11/conf/docker-compose.yml
+  #- docker-compose.yaml
+  #- /home/joe/eracks11/conf/docker-compose.yml
+  #- $user/.ssh/id_rsa
   #- .ssh/id_rsa_jjw
   #- .ssh/id_rsa_eracks
 ---
@@ -373,7 +376,8 @@ content: |
   # mount.sh generated $date by eVirt
   echo Mounting guest FS for $vmname
   mkdir -p .mount
-  guestmount -a $vmname.img -i --ro .mount
+  #guestmount -a $vmname.img -i --ro .mount
+  guestmount -a $vmname.img -i -w .mount
 ---
 section: unmount.sh
 action:
@@ -393,12 +397,24 @@ action:
         help: Download the bootable image defined in declarations
 content: |
   # download.sh generated $date by eVirt
+
+  # Convert python-replaced variable into bash var:
+  ${image="$image"}
+
+  echo IMAGE ${image}
+
+  # Check for remote / downloadable:
+  if ! ( ${image:0:4} == 'http' ); then {
+    echo Image $image is local - not downloading
+    exit
+  } fi
+
   # download image as basename
   if ( ls -l `basename $image` ); then
     echo IMAGE PRESENT - NOT DOWNLOADING!
   else
     echo Downloading: $image
-    wget -p $image
+    wget -O `basename $image` $image
   fi
 ---
 section: build.sh
@@ -421,12 +437,21 @@ content: |
   qemu-img convert -O qcow2 -c .evirt/cloudinit.img .evirt/cloudinit.qc2
   #qemu-img convert -O qcow2 -c $vmname.img $vmname.qc2
 ---
-section: setup.sh
+section: default.sh
 action:
   command:
-    setup:
-        help: Set up new vm dir with ev.yaml example, .evirt workdir & scripts
+    default:
+        help: Show running VMs
 content: |
+  echo All VMs:
+  ps axw |grep kvm | grep -v grep
+
+  echo
+  echo This VM:
+  ps axw | grep $vmname | grep -v grep
+  exit
+
+  # old setup:
   # copy ev.yaml fropm install dir
    if ( ls -l ev.yaml ); then
     echo EV.YAML ALREADY PRESENT - NOT OVERWRITING!

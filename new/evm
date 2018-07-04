@@ -1,1 +1,1 @@
-#! /home/joe/evirt/new/env/bin/python /home/joe/evirt/new/ev.py
+#! /bin/bash\n\n/home/joe/evirt/new/env/bin/python /home/joe/evirt/new/ev.py 

@@ -28,10 +28,12 @@ if ! test -d env; then {
 
 #sudo ln -sf $(pwd)/ev.py /usr/local/bin/evm
 
-echo "#! $(pwd)/env/bin/python $(pwd)/ev.py" >evm
+#echo "#! $(pwd)/env/bin/python $(pwd)/ev.py" >evm
+
+echo "#! /bin/bash\n\n$(pwd)/env/bin/python $(pwd)/ev.py $@" >evm
 chmod +x evm
 sudo ln -sf $(pwd)/ev /usr/local/bin/evm
 
-echo DONE
+echo DONE - REBOOT REQUIRED FOR /dev/kvm ACCESS FIRST TIME
 
 sudo ./stuffit.sh . env/bin/activate

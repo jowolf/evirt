@@ -14,7 +14,7 @@ from string import Template
 #from collections import OrderedDict
 import clg
 
-trace = 16  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
+trace = 0  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
 
 #declarations = {}  # done dynamically
 
@@ -170,6 +170,13 @@ class Section (object):
 
 
 ## Main
+
+evyaml = "ev.yaml"
+
+if not os.access (evyaml, os.R_OK):  # then copy the repo version as a starting point
+    from sh import cp
+    if trace: print ('Copying %s starter file' % evyaml)
+    cp (os.path.join (os.path.dirname (__file__), evyaml), evyaml)
 
 yaml = YAML (typ='rt')  # rt gives ordered dicts - nope: yaml.loader = yamlordereddictloader.SafeLoader
 g = yaml.load_all (open ('ev.yaml'))
