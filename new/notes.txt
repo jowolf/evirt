@@ -1,3 +1,19 @@
+7/21/18 Todo:
+- allow for local-per-machine evirt config
+- separate out local vm from global / repo commands, and config - read repo 1st, then config, then overlay local
+- auto-pickup docker-compose
+- auto-pickup iso or Ubuntu img
+
+This may allow for config-free deploy -
+
+Fix bionic for sudo-free docker usage - reboot?
+
+implem:
+- evm all (or default) - status all regardless of dir - see jwvc-nextcloud5
+- evm ssh - keep track of ssh target, and maybe key - set AcceptNewKeys=True, or StrictKeyChecking=False
+  ssh 127.0.0.1 -p 2222 -o StrictHostKeyChecking=False
+
+
 6/25/18 See Public Bridge Section, here:
 https://www.linux-kvm.org/page/Networking
 
@@ -19,6 +35,28 @@ default command - list running vms
 add $user, $installdir, and $cwd (tricky, could be vm or install dir) in addition to $date
 htop, alpine, mosh
 
+gg:
+linux kernel cmdline vga parm
+qemu grub parms
+
+So this works! with bionic kernel:
+sudo kvm -display sdl -vga std -kernel /vmlinuz  -append vga=0x31b nextcloud.img 
+https://unix.stackexchange.com/questions/71231/grub2-and-kernel-vga-parameter
+but panics - no initrd, root, etc
+
+it even works without the -display and -vga parms:
+joe@studio-bionic:/home/vm/nextcloud$ sudo kvm -kernel /vmlinuz  -append vga=0x31b nextcloud.img 
+
+Curses does not work, only gives "1280x1024 graphics mode :-("
+
+But this does:
+joe@studio-bionic:/home/vm/nextcloud$ sudo kvm -display curses -kernel /vmlinuz  -append vga=ask nextcloud.img 
+
+boots into interactive VGA ask screen :-)
+
+vga=6 gives much longer curses display (but only 80 wide - it's 80x60 IIRC)
+
+Need to modify image, I guess - use mount? automate?
 
 6/17/18 JJW
 check out:

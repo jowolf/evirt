@@ -134,9 +134,14 @@ class Section (object):
         decls.update (ud)
 
         # add files
+        decls ['file1'] = ''
+        decls ['file2'] = ''
+        decls ['file3'] = ''
 
         if decls.get ('files'):
+          #print (decls ['files'])
           for n,f in enumerate (decls ['files']):
+            #print ('FILES')
             #print (f)
             #print ('file%d' % (n+1))
             decls ['file%d' % (n+1)] =   \
@@ -146,11 +151,6 @@ class Section (object):
               # so that the embedded dest in the existing yaml looks like this, with a current indent of 4:
               #$file1
               # ...
-        else:
-            decls ['file1'] = ''
-
-        decls ['file2'] = ''
-        decls ['file3'] = ''
 
         return decls
 
