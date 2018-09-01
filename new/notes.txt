@@ -1,3 +1,17 @@
+9/1/18 epiphany - allow nestable inherit: command, check <install>/templates dir
+- Windows7-remote-desktop
+- ubuntu1604
+- ubuntu1804
+- mattermost
+- wordpress
+- cron
+
+
+7/28 Todo:
+Implem newvm command - mkdir + pre-pop w/example script
+eg:
+evm newvm serog-1804 [ubuntu 18.04 britta]
+
 7/21/18 Todo:
 - allow for local-per-machine evirt config
 - separate out local vm from global / repo commands, and config - read repo 1st, then config, then overlay local
