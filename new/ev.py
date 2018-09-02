@@ -182,15 +182,24 @@ class Section (object):
         self.save (declarations ['workdir'])
         self._commands ['subparsers'].update (more)
 
+    def inherit (self, fname):
+        # Read & apply sections from named yaml from <install>/templates
+        pass
+
 
 ## Main
 
 evyaml = "ev.yaml"
 
-if not os.access (evyaml, os.R_OK):  # then copy the repo version as a starting point
+if not os.access (evyaml, os.R_OK):  # ask then copy the repo version as a starting point
+  if input ("No ev.yaml found - copy starter template? [Y/n]").lower() == 'y':
     from sh import cp
     if trace: print ('Copying %s starter file' % evyaml)
     cp (os.path.join (os.path.dirname (__file__), evyaml), evyaml)
+  else:
+    sys.exit()
+
+HERE - procedurize this into readYaml or smth
 
 yaml = YAML (typ='rt')  # rt gives ordered dicts - nope: yaml.loader = yamlordereddictloader.SafeLoader
 g = yaml.load_all (open ('ev.yaml'))
