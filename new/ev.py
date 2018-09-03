@@ -14,9 +14,15 @@ from string import Template
 #from collections import OrderedDict
 import clg
 
-trace = 0  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
 
-#declarations = {}  # done dynamically
+## Globals
+
+trace = 4  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
+
+declarations = {}  # loaded dynamically
+
+installpath = os.path.dirname (__file__)
+
 
 ## Classes
 
@@ -77,10 +83,12 @@ class Section (object):
 
         # Note: the 'or' sntx does not allow for blank decls, while the 'get' sntx does
 
+        vmname  = decls.get ('vmname') or os.path.basename (os.getcwdb())
         workdir = decls.get ('workdir') or '.evirt'
+        ext     = decls.get ('ext', 'img')
 
-        hda     = decls.get ('hda') or decls ['vmname'] + '.' + decls.get ('ext', 'img')
-        #hdb     = decls.get ('hdb') or "-hdb %s" % os.path.join (workdir, 'cloudinit.qc2')
+        hda     = decls.get ('hda') or '%s.%s' % (vmname, ext)
+        #hdb    = decls.get ('hdb') or "-hdb %s" % os.path.join (workdir, 'cloudinit.qc2')
         hdb     = decls.get ('hdb', os.path.join (workdir, 'cloudinit.qc2'))
         hdc     = decls.get ('hdc')
         hdd     = decls.get ('hdd')
@@ -107,7 +115,9 @@ class Section (object):
         rdpport = decls.get ('rdpport', (39000 + iplast))
 
         ud = dict (
+            vmname  = vmname,
             workdir = workdir,
+            ext     = ext,
             hda     = hda,
             hdb     = hdb,
             hdc     = hdc,
@@ -166,10 +176,11 @@ class Section (object):
 
     def load (self, var):
         assert var == 'declarations'
-        globals() [var] = self.data
+        #globals() [var] = self.data
+        declarations.update (self.data)  # allow multiple updates
         self._parms (declarations)
 
-    def do (self, shell='bash'):
+    def _do (self, shell='bash'):
         assert shell == 'bash'
         from sh import bash
         cmd = shell + ' -c ' + self._content()
@@ -182,9 +193,41 @@ class Section (object):
         self.save (declarations ['workdir'])
         self._commands ['subparsers'].update (more)
 
-    def inherit (self, fname):
-        # Read & apply sections from named yaml from <install>/templates
-        pass
+    def inherit (self, flist):
+        print (flist)
+        for fname in flist:
+            print ('inheriting', fname)
+            # Read & apply sections from named yaml from <install dir>/templates
+            if os.access (fname, os.R_OK):  # check cwd first
+                print ('reading', fname)
+                readYaml (fname)
+            elif os.access (os.path.join (installpath, 'templates', fname), os.R_OK):  # then check templates
+                print ('reading', os.path.join (installpath, 'templates', fname))
+                readYaml (os.path.join (installpath, 'templates', fname))
+            else:
+                raise Exception ('File not found: ' + fname)
+
+
+## Functions
+
+def readYaml (pth):
+    yaml = YAML (typ='rt')  # rt gives ordered dicts - nope: yaml.loader = yamlordereddictloader.SafeLoader
+    g = yaml.load_all (open (pth))
+
+    #old:
+    #g = yaml.safe_load_all (open ('ev.yaml'))  # , Loader=yaml.CLoader)
+
+    # g is a generator object, make list (then zip into a list of tuples)
+    #docs = [OrderedDict (d) for d in g]
+    docs = [d for d in g]
+
+    if trace & 2:
+        for d in docs:
+            print ('DOC:', pformat (d))
+            print ('DOCS LEN', len (docs))
+
+    for d in docs:
+        Section (d)._process()
 
 
 ## Main
@@ -192,35 +235,20 @@ class Section (object):
 evyaml = "ev.yaml"
 
 if not os.access (evyaml, os.R_OK):  # ask then copy the repo version as a starting point
-  if input ("No ev.yaml found - copy starter template? [Y/n]").lower() == 'y':
+  if input ("No ev.yaml found - copy starter template? [y/n]").lower() == 'y':
     from sh import cp
     if trace: print ('Copying %s starter file' % evyaml)
-    cp (os.path.join (os.path.dirname (__file__), evyaml), evyaml)
+    cp (os.path.join (installpath, evyaml), evyaml)
   else:
+    import sys
     sys.exit()
 
-HERE - procedurize this into readYaml or smth
 
-yaml = YAML (typ='rt')  # rt gives ordered dicts - nope: yaml.loader = yamlordereddictloader.SafeLoader
-g = yaml.load_all (open ('ev.yaml'))
+readYaml (evyaml)
 
-#old:
-#g = yaml.safe_load_all (open ('ev.yaml'))  # , Loader=yaml.CLoader)
-
-# g is a generator object, make list (then zip into a list of tuples)
-#docs = [OrderedDict (d) for d in g]
-docs = [d for d in g]
-
-if trace & 2:
-    for d in docs:
-        print ('DOC:', pformat (d))
-        print ('DOCS LEN', len (docs))
-
-for d in docs:
-    Section (d)._process()
 
 args = Section._parse()
 
 for s in Section._sections:
     if s._match (args):
-        s.do()
+        s._do()

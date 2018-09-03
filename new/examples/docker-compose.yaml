@@ -1,4 +1,4 @@
-# example docker compaise file
+# example docker compose file
 
 version: '3'
 
