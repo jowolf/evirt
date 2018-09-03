@@ -17,7 +17,7 @@ import clg
 
 ## Globals
 
-trace = 4  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
+trace = 0  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
 
 declarations = {}  # loaded dynamically
 
@@ -154,13 +154,16 @@ class Section (object):
             #print ('FILES')
             #print (f)
             #print ('file%d' % (n+1))
-            decls ['file%d' % (n+1)] =   \
-                 ("- path: %s\n" % f)  + \
-              "    content: |\n"     + \
-              ''.join ([('      ' + lin) for lin in open(f)])
-              # so that the embedded dest in the existing yaml looks like this, with a current indent of 4:
-              #$file1
-              # ...
+            if os.access (f, os.R_OK):
+              decls ['file%d' % (n+1)] =   \
+                   ("- path: %s\n" % f)  + \
+                "    content: |\n"     + \
+                ''.join ([('      ' + lin) for lin in open(f)])
+                # so that the embedded dest in the existing yaml looks like this, with a current indent of 4:
+                #$file1
+                # ...
+            else:
+              print ("Warning - file not found: %s - skipping" % f)
 
         return decls
 

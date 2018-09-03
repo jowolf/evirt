@@ -7,6 +7,13 @@ declarations class?  for inherit, defaults, smart entries, etc?
 iplast: 0 should mean remote desktop instance (10.0.2.15 dhcp)
 d #vmname defaults to basename curdir
 
+10p
+d Warning: file not found, not including (for ssh keys, docker-compose.yaml, etc)
+(Instead of fault)
+
+Need to NOT write anything unless the command says to - help, <default / show>, err, etc
+so need more clg research
+
 
 7/21/18 Todo:
 - allow for local-per-machine evirt config
