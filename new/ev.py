@@ -78,7 +78,7 @@ class Section (object):
         '''
         if trace & 2: print ('DECLS:', decls)
 
-        #-drive file=boot-disk.img,if=virtio \
+        #-drive file=boot-disk.img,if=virtio
         #-drive file=seed.iso,if=virtio
 
         # Note: the 'or' sntx does not allow for blank decls, while the 'get' sntx does
@@ -93,7 +93,7 @@ class Section (object):
         hdc     = decls.get ('hdc')
         hdd     = decls.get ('hdd')
 
-        drives  = "-drive file=%s,if=virtio " % hda
+        drives  = decls.get ('drives', "-drive file=%s,if=virtio " % hda)
         if hdb: drives += "-drive file=%s,if=virtio " % hdb
         if hdc: drives += "-drive file=%s,if=virtio " % hdc
         if hdd: drives += "-drive file=%s,if=virtio " % hdd
