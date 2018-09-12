@@ -1,3 +1,8 @@
+NOTE:  Nothing here that isn't in base or build - need usbdevice tablet, and rdp conncection -
+Both of those can be in declarations
+
+delete:
+
 section: start.sh
 action:
   command:
