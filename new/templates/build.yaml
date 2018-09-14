@@ -279,19 +279,23 @@ content: |
   # download.sh generated $date by eVirt
 
   # Convert python-replaced variable into bash var:
+  #   could call it 'baseimage', but that has two meanings - 
+  #   the base image itself, or the basename of the image url
   ${image="$image"}
 
   echo IMAGE ${image}
+  #echo IMAGE 0 FOR 4 \"${image:0:4}\"
+  #if test ${image:0:4} != htxtp; then echo neq; else echo no; fi
 
   # Check for remote / downloadable:
-  if ! ( ${image:0:4} == 'http' ); then {
+  if test ${image:0:4} != http; then {
     echo Image $image is local - not downloading
     exit
   } fi
 
   # download image as basename
   if ( ls -l `basename $image` ); then
-    echo IMAGE PRESENT - NOT DOWNLOADING!
+    echo DOWNLOADED BASE IMAGE PRESENT - NOT DOWNLOADING!
   else
     echo Downloading: $image
     wget -O `basename $image` $image
@@ -304,15 +308,34 @@ action:
         help: Build / make new VM from ev.yaml using cloud-init, userdata, metadata, and declarations.
         #metavar: make-new-vm
 content: |
-  # copy downloaded image as $vmname.img
+  # build.sh - generated $date by eVirt
+  # copy downloaded image as $vmname.$ext
+  
+  # For now, assumes .img - see notes / todo
+  fname=`basename $image` 
+
   if ( ls -l $vmname.img ); then
-    echo IMAGE PRESENT - NOT COPYING!
+    echo VM IMAGE PRESENT - NOT COPYING!
   else
     # copy from image location:
-    cp `basename $image` $vmname.img
+    #echo $image
+    #echo $fname
+    #echo test -e $fname
+
+    if test -e $fname; then
+      echo Copying from downloaded base image...
+      cp $fname $vmname.img
+    elif test -e $installdir/$fname; then
+      echo Copying from downloaded base image in eVirt Install dir...
+      cp $installdir/$fname $vmname.img
+    fi
   fi
 
-  qemu-img resize $vmname.img $size
+  if test $ext == qc2; then {
+    qemu-img convert -O qcow2 -c $vmname.img $vmname.qc2
+  } fi
+
+  qemu-img resize $vmname.$ext $size
   cloud-localds $workdir/cloudinit.img $workdir/userdata.yaml # $workdir/metadata.yaml
   qemu-img convert -O qcow2 -c .evirt/cloudinit.img .evirt/cloudinit.qc2
-  #qemu-img convert -O qcow2 -c $vmname.img $vmname.qc2
+

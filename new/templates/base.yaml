@@ -75,7 +75,7 @@ action:
 content: |
   # status.sh generated $date by eVirt
 
-  trace = $1
+  trace=$1
 
   if test -s $vmname.log; then {
     echo "$vmname.log: `tail $vmname.log`"
@@ -92,13 +92,13 @@ content: |
 
   s=`sudo ps -axw | grep $vmname |grep -v grep`
 
-  if trace; then {
+  if test "$trace"; then {
     echo TRACE \"$trace\"
     echo S $s
     echo TEST `test -n s`
   } fi
 
-  if s; then {
+  if test "$s"; then {
     echo VM is running:
     echo $s
   } else {
@@ -150,6 +150,26 @@ action:
         help: Telnet to the KVM monitor interface
 content: |
   # monitor.sh generated $date by eVirt
-  echo Cut and paste (todo: stuffit) :
-  echo telnet 127.0.0.1 $((23000+$iplast))
-joe@openstack16:/home/vm$
+  # d echo Cut and paste (todo: stuffit) :
+  stuffit telnet 127.0.0.1 $((23000+$iplast))
+---
+section: ssh.sh
+action:
+  command:
+    ssh:
+        help: Local SSH into the VM
+content: |
+  # ssh.sh generated $date by eVirt
+
+  ${privkey} = $privkey
+
+  echo ssh
+
+  if test ${privkey} && test -e $privkey; then
+    #echo 'ssh -t -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1 < `tty`'
+    stuffit ssh -t -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1
+    #ssh -t -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1 < `tty`
+  else
+    #echo 'ssh -t -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1 < `tty`'
+    stuffit ssh -t -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1
+  fi

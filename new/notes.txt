@@ -1,6 +1,14 @@
+9/13/18 Todo:
+
+dl base images to known dir, reuse - currently as of today have to copy manually to $installdir
+
+have default / all not require ev.yaml - 
+  - this will require separation of copy/do from load -
+
+
 9/5/18
 
-Copied jw5-nextcloud as new bnase, copied base to build
+Copied jw5-nextcloud as new base, copied base to build
 
 Todo: finish / test build, files, git(lab) repo(s)
 

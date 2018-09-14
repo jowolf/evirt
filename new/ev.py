@@ -83,7 +83,7 @@ class Section (object):
 
         # Note: the 'or' sntx does not allow for blank decls, while the 'get' sntx does
 
-        vmname  = decls.get ('vmname') or os.path.basename (os.getcwdb())
+        vmname  = decls.get ('vmname') or os.path.basename (os.getcwd())
         workdir = decls.get ('workdir') or '.evirt'
         ext     = decls.get ('ext', 'img')
 
@@ -115,6 +115,7 @@ class Section (object):
         rdpport = decls.get ('rdpport', (39000 + iplast))
 
         ud = dict (
+            installdir = installpath,
             vmname  = vmname,
             workdir = workdir,
             ext     = ext,
@@ -212,6 +213,24 @@ class Section (object):
 
 
 ## Functions
+
+def stuffit (s):
+    import sys, fcntl, termios  #, os
+
+    # see:
+    # http://stackoverflow.com/questions/29614264/unable-to-fake-terminal-input-with-termios-tiocsti
+    # http://stackoverflow.com/questions/6191009/python-finding-stdin-filepath-on-linux
+
+    tty = os.ttyname(sys.stdin.fileno())
+
+    s += "\n"
+
+    with open(tty, 'w') as fd:
+        for c in ' '.join (sys.argv [1:]):
+            fcntl.ioctl(fd, termios.TIOCSTI, c)
+
+    #fcntl.ioctl(fd, termios.TIOCSTI, '\n')
+
 
 def readYaml (pth):
     yaml = YAML (typ='rt')  # rt gives ordered dicts - nope: yaml.loader = yamlordereddictloader.SafeLoader

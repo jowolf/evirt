@@ -35,6 +35,8 @@ echo "#! /bin/bash\n\n$(pwd)/env/bin/python $(pwd)/ev.py $@" >evm
 chmod +x evm
 sudo ln -sf $(pwd)/ev /usr/local/bin/evm
 
+sudo ln -sf $(pwd)/stuffit.sh /usr/local/bin/stuffit
+
 echo DONE - REBOOT REQUIRED FOR /dev/kvm ACCESS FIRST TIME
 
 sudo ./stuffit.sh . env/bin/activate
