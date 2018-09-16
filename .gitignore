@@ -4,6 +4,8 @@ scripts/createvm/eRacks*.50
 *.img
 new/env/*
 new/.evirt/*
+evm
+stuffit
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

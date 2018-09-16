@@ -1,8 +1,29 @@
-9/13/18 Todo:
+9/15
+su $user
+files section should have t owner, perms, dest
+go.sh and stuffit
 
+check image for basename automaticaly, no need for 2 separate decls
+
+if '.' in cwd: vm,ip=cwd.split('.')?
+
+
+9/14
+t fix start, perms, stop, kill, tap name for 0 IP
+n private_repo or just commands section
+p log commands into all-caps touch files
+
+test netdev virtio
+
+win7 qb - install virtio drivers
+
+implement --trace opt
+
+
+9/13/18 Todo:
 dl base images to known dir, reuse - currently as of today have to copy manually to $installdir
 
-have default / all not require ev.yaml - 
+have default / all not require ev.yaml -
   - this will require separation of copy/do from load -
 
 

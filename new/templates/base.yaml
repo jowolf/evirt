@@ -6,7 +6,7 @@ action:
 content: |
   # start.sh generated $date by eVirt
 
-  tapif=tap-$iplast
+  #tapif=tap-$iplast now set in decls
   user=`whoami`
   trace=$1
 
@@ -16,7 +16,7 @@ content: |
 
   sudo ip tuntap add $tapif mode tap user $user
   sudo ip link set $tapif up
-  sleep 0.2s
+  sleep 0.5s
   sudo ip link set $tapif master br0
 
   log=$vmname.log
@@ -37,7 +37,7 @@ content: |
 
   (echo "system_powerdown"; sleep 5; echo "quit" ) | telnet 127.0.0.1 $((23000+$iplast))
   sleep 2
-  ip tuntap del $1 mode tap
+  ip tuntap del $tapif mode tap
   echo $vmname stopped.
 ---
 section: reboot.sh
@@ -64,7 +64,7 @@ content: |
 
   # so use awk
   sudo kill -HUP $(ps ax |grep $vmname |grep -v grep | awk '{ print $1; }' )
-  ip tuntap del $1 mode tap
+  ip tuntap del $tapif mode tap
   echo $vmname killed.
 ---
 section: status.sh
@@ -87,9 +87,6 @@ content: |
     echo
   } fi
 
-  echo "Image info: `qemu-img info $vmname.$ext`"
-  echo
-
   s=`sudo ps -axw | grep $vmname |grep -v grep`
 
   if test "$trace"; then {
@@ -103,6 +100,9 @@ content: |
     echo $s
   } else {
     echo VM not running.
+    echo
+    echo "Image info: `qemu-img info $vmname.$ext`"
+    echo
   } fi
 ---
 section: mount.sh
@@ -136,10 +136,10 @@ action:
 content: |
   # all.sh generated $date by eVirt
   # default.sh generated $date by eVirt
-  
+
   #ps axw | grep kvm | grep -v grep
   #sudo netstat -antp
-  
+
   ps axw | grep qemu | grep -v grep
   sudo netstat -antp |grep qemu
 ---
@@ -151,7 +151,7 @@ action:
 content: |
   # monitor.sh generated $date by eVirt
   # d echo Cut and paste (todo: stuffit) :
-  stuffit telnet 127.0.0.1 $((23000+$iplast))
+  sudo stuffit telnet 127.0.0.1 $((23000+$iplast))
 ---
 section: ssh.sh
 action:
@@ -161,15 +161,25 @@ action:
 content: |
   # ssh.sh generated $date by eVirt
 
-  ${privkey} = $privkey
+  privkey=$privkey
 
-  echo ssh
+  ssh-keygen -f "/home/$user/.ssh/known_hosts" -R "[127.0.0.1]:2222"
 
   if test ${privkey} && test -e $privkey; then
     #echo 'ssh -t -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1 < `tty`'
-    stuffit ssh -t -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1
-    #ssh -t -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1 < `tty`
+    sudo stuffit ssh -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1
   else
     #echo 'ssh -t -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1 < `tty`'
-    stuffit ssh -t -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1
+    sudo stuffit ssh -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1
   fi
+---
+section: vnc.sh
+action:
+  command:
+    vnc:
+        help: Run VNC (Vinagre) on local VM
+content: |
+  # vnc.sh generated $date by eVirt
+
+  sudo stuffit vinagre 127.0.0.1:59000
+  # todo: enh for IP and port

@@ -39,146 +39,7 @@ content: |
     - unp
     - git
     - docker.io
-  comment:
-    - path: /home/joe/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
-      content: |
-        network: {config: disabled}
-    - path: /home/joe/etc/network/interfaces.d/50-cloud-init.cfg
-      content: |
-        # This file is generated from information provided by
-        # the datasource.  Changes to it will not persist across an instance.
-        # To disable cloud-init's network configuration capabilities, write a file
-        # /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:
-        # network: {config: disabled}
-        auto lo
-        iface lo inet loopback
-        # JJW from cloudinit
-        #auto ens3
-        #iface ens3 inet dhcp
-    - path: /home/joe/etc/network/interfaces.d/40-ens3-static-ip.cfg
-      content: |
-        auto ens3
-        iface ens3 inet static
-          address 216.172.134.$iplast
-          #network 216.172.134.0
-          netmask 255.255.255.128
-          #broadcast 216.172.134.255
-          gateway 216.172.134.1
-          dns-nameservers 72.13.81.2 72.13.91.2 8.8.8.8 4.2.2.1 4.2.2.2 4.2.2.3
-        local-hostname: $host
-    - path: /root/.ssh/id_rsa_eracks-deploy
-      content: |
-        -----BEGIN RSA PRIVATE KEY-----
-        MIIEowIBAAKCAQEAqFNOOZcCHcA0uOFLg/8voZB3L1t4p37l7I0Xv774efJYDXgr
-        wKRJfoqsDaVx8lGjkHmkGgTOp0oPmG/cs10rQZtvBl6z2ereR8tXSb6XYoC7CV4m
-        5+VfQMP3z4kmqwlKgX6mlGLNDY3o1mj0jxwNDAQ9h5ncr1zVmP23zrtbj0kXYvxc
-        bKUTtwDrbOhksOh9hZcAgGg6APMuFaqdz0iZQrdpnES4Tqd4C8Gn336cixEN7TIM
-        hHWGmqhhqqndez1y5JyuT9DwsttsAc1EC3V2EJrfZLJEOeRxqkncT2tAUXNwEBGG
-        rE8EYDzJ7YD72zqk0sAsOGRZIq+lOmXrC2J8fwIDAQABAoIBADJZMLXTMIPboSmH
-        4kGqTAIEp1HYB3/6WiXmkir9oW9AiQwGXPfzbDRYoFw4l5vGxakKaYaK15F8equ7
-        EgXooW6vYodCPoO5WCGbdhGN29RP8yI7MmH83wANXguK17EjR1DypDsQTot2XiX8
-        IOLJnjFw90KfSD6AAzgO9DL3Icz6sLmY/dAqOIVT6dtmkO3xmutjP9bi7/4FGYBC
-        tG+LooPNDFvAo6WHxVt9MItLPmpdd8vWx/Ev5KOdJ5oBAGaulrkgA79b/szYJ/zA
-        lvX7IT4rfaadnNWxhG2hJLGCWDP5VhfqDzEsAKKkrty/zq5Bw8ug7xu4nvngRU38
-        5+1HvYkCgYEA08GIeYb7nwCm8bj5pl6nb17DaQTQ9iukj8AlGJNiWi6Qycd41vFF
-        0AKner1XzBC/bUl3o/AnPfDv5JdSfspTg1fsFChJ7eI1OX/2fP8cU7LWMVQb5CZq
-        q4l0GbBhVV0OBGM3NayHnemfIWq2S7qyn9yybAIAuE2alZ2d1TQ3xisCgYEAy36+
-        tdc7JhNXLaX61PxHO+yh5f45qHSCy93sKChZTCHbD8OzsH60AmORxbKxo0JB0t/Y
-        ZTXgbpE5aAxSE1tFg8ngMQ/at/LWvZopKKvq7K0HOBLDzW4Wy+YFl4scIEjN0K9f
-        CTJNcVH3rpPqrW+gD4wK3kDQYFo7HPtQh3q87P0CgYBGR4o7A1DJodbGjSTWUb3y
-        WZozZbTQrwVr7FKjiG7xDVlijsCNXgBUnDznoKXeBYTzCZoan972UNvdm1d220HC
-        atDgk8qNmDEgB1dQfv7wzH8IWijznMh0bCdLS13SjhLT4/Xz63ILN/lnhto/4hPc
-        uMvCyxtgD+mJVImItE76hwKBgFXpCHKUjzAf8iofbKoGZ7xwxljm30izB5Ux98Vs
-        Y2a01FrvcCkPFMf9aUlhi4U1L7zrK9xuxnVncijvKqdpXQuqaq/L1bbbGrWpI787
-        9U4+LlIJ+gf8djtWvP2hiRpIIjv8Dc9AIVm6FSrq36Sg/54QrXXvPwmujk5J+1F3
-        C9OxAoGBAMLraoF23/yOfNQ3S7ooz1WcF3Ae7TCXsoTnf8hNQ3VvZN0+ehgZYXl/
-        SEe63pluyqG96HI+O7Eknh7MokdXGzKhL+9F+GX3z0NvLh+mNCzi8XJajfVvcid6
-        3pzWkdilhJ/o33XivfNMAOonyK+fMWO9Mxg4dMBz7SPQy4DWfa2M
-        -----END RSA PRIVATE KEY-----
-    - path: /root/.ssh/id_rsa_jjw-salt-deploy
-      content: |
-        -----BEGIN RSA PRIVATE KEY-----
-        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
-        -----END RSA PRIVATE KEY-----
   write_files:
-    #- path: /var/lib/cloud-compose/docker-compose.yml
-    - path: /home/joe/docker-compose.yml
-      content: |
-        version: '3.3'
-
-        services:
-           db:
-             image: mysql:5.7
-             volumes:
-               - db_data:/var/lib/mysql
-             restart: always
-             environment:
-               MYSQL_ROOT_PASSWORD: somewordpress
-               MYSQL_DATABASE: wordpress
-               MYSQL_USER: wordpress
-               MYSQL_PASSWORD: wordpress
-
-           wordpress:
-             depends_on:
-               - db
-             image: wordpress:latest
-             ports:
-               - "8000:80"
-             restart: always
-             environment:
-               WORDPRESS_DB_HOST: db:3306
-               WORDPRESS_DB_USER: wordpress
-               WORDPRESS_DB_PASSWORD: wordpress
-        volumes:
-            db_data:
     - path: /root/cloud-init-runcmd.sh
       permissions: '0770'
       comment: |
@@ -210,28 +71,53 @@ content: |
         salt-call --local --file-root=. state.apply joe
         salt-call --local --file-root=. state.apply salt-minion
         salt-call --local --file-root=. state.apply hostname-from-minion-id
-
       content: |
-        touch DOING_KEYSCAN
-        sudo -u joe ssh-keyscan -H github.com >>/home/joe/.ssh/known_hosts
-        touch PRECONFIG_BASH_HISTORY
-        echo tail -f /var/log/cloud-init-output.log >> /home/joe/.bash_history
-        echo less /var/log/cloud-init-output.log >> /home/joe/.bash_history
-        touch CLONE_GIT_REPO
-        ssh-agent bash -c 'ssh-add $git_repo_key && git clone -q $git_repo'
-        touch CHOWN_JOE
-        sudo chown -R joe:joe /home/joe
-        cd /home/joe
+        cd /home/$user
 
-        echo SETTING UP DOCKER_COMPOSE
+        echo DOING_KEYSCAN
+        touch DOING_KEYSCAN
+        sudo -u $user ssh-keyscan -H github.com >>/home/$user/.ssh/known_hosts
+        echo DONE >> DOING_KEYSCAN
+
+        echo PRECONFIG_BASH_HISTORY
+        touch PRECONFIG_BASH_HISTORY
+        echo tail -f /var/log/cloud-init-output.log >> /home/$user/.bash_history
+        echo less /var/log/cloud-init-output.log >> /home/$user/.bash_history
+        echo DONE >> PRECONFIG_BASH_HISTORY
+
+        # now used only for salt
+        echo CLONE_GIT_REPO
+        touch CLONE_GIT_REPO
+        #ssh-agent bash -c 'ssh-add $git_repo_key && git clone -q $git_repo' >> CLONE_GIT_REPO
+        # do them separately so we can do pub repos w/o key
+        ssh-agent bash -c 'ssh-add $git_repo_key' >> CLONE_GIT_REPO
+        ssh-agent bash -c 'git clone -q $git_repo' >> CLONE_GIT_REPO
+        echo DONE >> CLONE_GIT_REPO
+
+        echo SETTING_UP_DOCKER_COMPOSE
         touch SETTING_UP_DOCKER_COMPOSE
         # sudo apt-get install python-virtualenv
         virtualenv -v env
         #./go.sh
         . env/bin/activate
-        pip install docker-compose
-        docker-compose up --build
+        pip install docker-compose >> SETTING_UP_DOCKER_COMPOSE
+        echo DONE >> SETTING_UP_DOCKER_COMPOSE
 
+        echo CHOWN_$user
+        touch CHOWN_$user
+        sudo chown -R $user:$user /home/$user
+        echo DONE >> CHOWN_$user
+
+        echo DOING_STARTUP_COMMANDS > DOING_STARTUP_COMMANDS
+        sudo -u $user sh -c "startup.sh >> DOING_STARTUP_COMMANDS"
+        echo DONE >> DOING_STARTUP_COMMANDS
+
+        # now done in strtup commands above
+        #echo DOING_DOCKER_COMPOSE_BUILD
+        #docker-compose up --build >> DOING_DOCKER_COMPOSE_BUILD
+        #echo DONE >> DOING_DOCKER_COMPOSE_BUILD
+
+        # old nextcloud stuff:
         #docker pull filcuc/nextcloud:latest
         #docker create --name nextcloud-data filcuc/nextcloud:latest /bin/true
         #docker run -ti --rm --volumes-from nextcloud-data --name nextcloud-app -p 80:80 -p 443:443 filcuc/nextcloud:latest setup --nc-db='pgsql' --nc-db-user='nextcloud' --nc-db-pass='nextcloud' --nc-db-name='nextcloud' --nc-url='https://download.nextcloud.com/server/releases/nextcloud-9.0.53.tar.bz2' --nc-archive='nextcloud-9.0.53.tar.bz2' --nc-admin-name='admin' --nc-admin-pass='admin' --nc-dir-name='nextcloud' --ng-root='/var/www/' --ng-user='www-data' --ng-domain='jw.vc'
@@ -241,13 +127,14 @@ content: |
     $file2
     $file3
   comment: |
-    commentes ANYWHERE in the runcmd list break the module - sheesh.
+    comments ANYWHERE in the runcmd list break the module - sheesh.
     echo Wow! comments break the runcmd of cloudinit: \# $cmd2 $cmd3 etc
   runcmd:
     - cd /root
-    - echo RUNNING RUNCMD SCRIPT
-    - bash cloud-init-runcmd.sh
-    - touch DONE
+    - echo RUNNING_RUNCMD_SCRIPT
+    - touch RUNNING_RUNCMD_SCRIPT
+    - bash cloud-init-runcmd.sh >>RUNNING_RUNCMD_SCRIPT
+    - echo DONE >>RUNNING_RUNCMD_SCRIPT
 ---
 section: metadata.yaml
 action:
@@ -279,7 +166,7 @@ content: |
   # download.sh generated $date by eVirt
 
   # Convert python-replaced variable into bash var:
-  #   could call it 'baseimage', but that has two meanings - 
+  #   could call it 'baseimage', but that has two meanings -
   #   the base image itself, or the basename of the image url
   ${image="$image"}
 
@@ -310,9 +197,9 @@ action:
 content: |
   # build.sh - generated $date by eVirt
   # copy downloaded image as $vmname.$ext
-  
+
   # For now, assumes .img - see notes / todo
-  fname=`basename $image` 
+  fname=`basename $image`
 
   if ( ls -l $vmname.img ); then
     echo VM IMAGE PRESENT - NOT COPYING!
@@ -328,6 +215,8 @@ content: |
     elif test -e $installdir/$fname; then
       echo Copying from downloaded base image in eVirt Install dir...
       cp $installdir/$fname $vmname.img
+    else
+      echo No downloaded image file present - $image
     fi
   fi
 

@@ -17,7 +17,7 @@ import clg
 
 ## Globals
 
-trace = 0  # 1: misc 2: docs, decls, 4: actions, sections; 8: commands / args, 16: update dict
+trace = 0  # 1:misc 2:docs/decls; 4:actions/sections; 8:commands/args, 16:update dict; 32:inherit
 
 declarations = {}  # loaded dynamically
 
@@ -76,6 +76,9 @@ class Section (object):
         Build parms from declarations for start, stop, monitor, etc - ports, etc -
         Could break out into sep module or inh class for bsx rules
         '''
+        def trailing_number(s):
+            return int (s [len (s.rstrip ('0123456789')):] or '0')
+
         if trace & 2: print ('DECLS:', decls)
 
         #-drive file=boot-disk.img,if=virtio
@@ -85,7 +88,8 @@ class Section (object):
 
         vmname  = decls.get ('vmname') or os.path.basename (os.getcwd())
         workdir = decls.get ('workdir') or '.evirt'
-        ext     = decls.get ('ext', 'img')
+        ext     = decls.get ('ext', 'qc2')
+        user    = decls.get ('user', os.environ.get ('USER'))
 
         hda     = decls.get ('hda') or '%s.%s' % (vmname, ext)
         #hdb    = decls.get ('hdb') or "-hdb %s" % os.path.join (workdir, 'cloudinit.qc2')
@@ -99,7 +103,8 @@ class Section (object):
         if hdd: drives += "-drive file=%s,if=virtio " % hdd
 
         vmdir   = decls.get ('vmdir') or os.getcwd()
-        iplast  = decls.get ('iplast') if 'iplast' in decls else int (os.path.basename (os.getcwd()))  # last tumbler of IP4 address
+        iplast  = decls.get ('iplast', trailing_number (os.path.basename (os.getcwd())))  # last tumbler of IP4 address
+        tapif   = decls.get ('tapif', 'tap-%s' % (iplast or vmname))
         macaddr = decls.get ('macaddr', "de:ad:be:ef:%02d:%02d" % ((iplast / 100), (iplast % 100)))
         #net     = decls.get ('net', "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast))
         #net     = decls.get ('net', "-net nic,macaddr=%s -net tap,ifname=tap-%s,helper=/etc/qemu-ifup,downscript=no" % (macaddr, iplast))
@@ -126,6 +131,7 @@ class Section (object):
             drives  = drives,
             vmdir   = vmdir,
             iplast  = iplast,
+            tapif   = tapif,
             macaddr = macaddr,
             net     = net,
             vncport = vncport,
@@ -157,9 +163,10 @@ class Section (object):
             #print ('file%d' % (n+1))
             if os.access (f, os.R_OK):
               decls ['file%d' % (n+1)] =   \
-                   ("- path: %s\n" % f)  + \
-                "    content: |\n"     + \
-                ''.join ([('      ' + lin) for lin in open(f)])
+                ("- path: %s\n" % (f if f.startswith('/') else os.path.join ('/home', user, f)))  + \
+                ("    owner: %s\n" % user) + \
+                 "    content: |\n"     + \
+                 ''.join ([('      ' + lin) for lin in open(f)])
                 # so that the embedded dest in the existing yaml looks like this, with a current indent of 4:
                 #$file1
                 # ...
@@ -198,15 +205,15 @@ class Section (object):
         self._commands ['subparsers'].update (more)
 
     def inherit (self, flist):
-        print (flist)
+        if trace & 32: print (flist)
         for fname in flist:
-            print ('inheriting', fname)
+            if trace & 32: print ('inheriting', fname)
             # Read & apply sections from named yaml from <install dir>/templates
             if os.access (fname, os.R_OK):  # check cwd first
-                print ('reading', fname)
+                if trace & 32: print ('reading', fname)
                 readYaml (fname)
             elif os.access (os.path.join (installpath, 'templates', fname), os.R_OK):  # then check templates
-                print ('reading', os.path.join (installpath, 'templates', fname))
+                if trace & 32: print ('reading', os.path.join (installpath, 'templates', fname))
                 readYaml (os.path.join (installpath, 'templates', fname))
             else:
                 raise Exception ('File not found: ' + fname)
@@ -256,7 +263,9 @@ def readYaml (pth):
 
 evyaml = "ev.yaml"
 
-if not os.access (evyaml, os.R_OK):  # ask then copy the repo version as a starting point
+if not os.access (evyaml, os.R_OK):  # start w/Base, look for args
+  # readYaml ('base.yaml')
+  # Ask, then copy the repo version as a starting point
   if input ("No ev.yaml found - copy starter template? [y/n]").lower() == 'y':
     from sh import cp
     if trace: print ('Copying %s starter file' % evyaml)
@@ -271,6 +280,7 @@ readYaml (evyaml)
 
 args = Section._parse()
 
+# use dict here
 for s in Section._sections:
     if s._match (args):
         s._do()
