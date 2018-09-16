@@ -7,6 +7,8 @@ check image for basename automaticaly, no need for 2 separate decls
 
 if '.' in cwd: vm,ip=cwd.split('.')?
 
+@willow st: Why not put whole vm tree in evirt?  setup should symlink out into /home/vm (and /vm)
+
 
 9/14
 t fix start, perms, stop, kill, tap name for 0 IP
