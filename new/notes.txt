@@ -1,7 +1,18 @@
+9/16
+gen new joe pw
+
+slplit out firstboot.sh and startup.sh - run startup and copy to rc.local
+
+eracks
+wp
+nextcloud
+16.04 britta
+tlg
+
 9/15
-su $user
-files section should have t owner, perms, dest
-go.sh and stuffit
+t su $user
+p files section should have d owner, perms, dest
+t go.sh and stuffit
 
 check image for basename automaticaly, no need for 2 separate decls
 

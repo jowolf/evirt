@@ -171,7 +171,6 @@ class Section (object):
               decls ['file%d' % (n+1)] =   \
                 ("- path: %s\n" % (f if f.startswith('/') else os.path.join ('/home', user, f)))  + \
                 ("    owner: %s\n" % user) + \
-                 "    permissions: '0770'\n" + \
                  "    content: |\n"     + \
                  ''.join ([('      ' + lin) for lin in open(f)])
                 # so that the embedded dest in the existing yaml looks like this, with a current indent of 4:

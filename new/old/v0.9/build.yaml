@@ -15,7 +15,7 @@ content: |
      size: "auto" # or size in bytes
      maxsize: 2147483648  # 8G should work, see https://bugs.launchpad.net/ubuntu/+source/cloud-init/+bug/1410824
   groups:
-    - $user: [sys, users]
+    - $user: [sys, docker]
   users:
     - name: $user
       gecos: $user
@@ -51,6 +51,35 @@ content: |
             fcntl.ioctl (fd, termios.TIOCSTI, c)
     - path: /root/cloud-init-runcmd.sh
       permissions: '0770'
+      comment: |
+        cd /root
+        echo IN ROOT INSTALLING SALT
+        pwd
+        id
+        ifdown ens3; ifup ens3
+        ifconfig -a
+        curl -L https://bootstrap.saltstack.com -o install_salt.sh
+        sudo sh install_salt.sh -U -P -A desqhost.com -i $host
+        echo SETTING UP SALT KEYS AND REPOS
+        chmod 400 /root/.ssh/id_rsa_jjw-salt-deploy
+        chmod 400 /root/.ssh/id_rsa_eracks-deploy
+        echo "cp is necessary here due to write_files bug, it's done before user creation, and creates the joe home dir owned by root"
+        cp /root/.ssh/id_rsa_eracks-deploy /home/joe/.ssh/id_rsa_eracks-deploy
+        echo tail -f /var/log/cloud-init-output.log >> /home/joe/.bash_history
+        echo less /var/log/cloud-init-output.log >> /home/joe/.bash_history
+        ssh-keyscan -H github.com >>/root/.ssh/known_hosts
+        - - -
+        ssh-agent bash -c 'ssh-add .ssh/id_rsa_jjw-salt-deploy && git clone -q git@github.com:jowolf/jjw-salt-master.git'
+        #echo SETTING UP ERACKS REPO
+        #sudo -iu joe ssh-agent bash -c 'ssh-add .ssh/id_rsa_eracks-deploy && git clone -q git@github.com:jowolf/eracks11.git'
+        echo SETTING UP TLG REPO
+        git clone -q git@github.com:jowolf/tlg.git
+        chown -R joe:joe /home/joe
+        echo APPLYING SALT STATES
+        cd jjw-salt-master/salt
+        salt-call --local --file-root=. state.apply joe
+        salt-call --local --file-root=. state.apply salt-minion
+        salt-call --local --file-root=. state.apply hostname-from-minion-id
       content: |
         cd /home/$user
 
@@ -92,9 +121,16 @@ content: |
         sudo -u $user sh -c "sh startup.sh >> DOING_STARTUP_COMMANDS"
         echo DONE >> DOING_STARTUP_COMMANDS
 
-        #echo DOING_FIRSTBOOT_COMMANDS
-        #sudo -u $user sh -c "sh startup.sh >> DOING_FIRSTBOOT_COMMANDS"
-        #echo DONE >> DOING_FIRSTBOOT_COMMANDS
+        # now done in strtup commands above
+        #echo DOING_DOCKER_COMPOSE_BUILD
+        #docker-compose up --build >> DOING_DOCKER_COMPOSE_BUILD
+        #echo DONE >> DOING_DOCKER_COMPOSE_BUILD
+
+        # old nextcloud stuff:
+        #docker pull filcuc/nextcloud:latest
+        #docker create --name nextcloud-data filcuc/nextcloud:latest /bin/true
+        #docker run -ti --rm --volumes-from nextcloud-data --name nextcloud-app -p 80:80 -p 443:443 filcuc/nextcloud:latest setup --nc-db='pgsql' --nc-db-user='nextcloud' --nc-db-pass='nextcloud' --nc-db-name='nextcloud' --nc-url='https://download.nextcloud.com/server/releases/nextcloud-9.0.53.tar.bz2' --nc-archive='nextcloud-9.0.53.tar.bz2' --nc-admin-name='admin' --nc-admin-pass='admin' --nc-dir-name='nextcloud' --ng-root='/var/www/' --ng-user='www-data' --ng-domain='jw.vc'
+        # --le-email='j@jw.vc'
         exit
     $file1
     $file2
