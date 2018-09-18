@@ -39,6 +39,8 @@ echo -e "#! /bin/bash\n\n$(pwd)/env/bin/python $(pwd)/stuffit.py \$@" >stuffit
 chmod +x stuffit
 sudo ln -sf $(pwd)/stuffit /usr/local/bin/stuffit
 
+sudo ln -s $(pwd)/vm /home/vm
+
 echo DONE - REBOOT REQUIRED FOR /dev/kvm ACCESS FIRST TIME
 
 sudo stuffit . env/bin/activate

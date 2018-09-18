@@ -95,14 +95,16 @@ content: |
     echo TEST `test -n s`
   } fi
 
+  echo "Image info: `qemu-img info $vmname.$ext`"
+  echo
+
   if test "$s"; then {
     echo VM is running:
     echo $s
   } else {
     echo VM not running.
-    echo
-    echo "Image info: `qemu-img info $vmname.$ext`"
-    echo
+    #echo
+    #echo "Image info: `qemu-img info $vmname.$ext`"
   } fi
 ---
 section: mount.sh
