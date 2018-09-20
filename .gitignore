@@ -3,11 +3,14 @@
 scripts/createvm/eRacks*.50
 new/env/*
 .evirt/
+/nfg
 evm
 stuffit
 *.img
 *.qc2
 *.qcow2
+*.xz
+*.kate-swp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

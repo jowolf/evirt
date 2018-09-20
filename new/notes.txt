@@ -1,7 +1,10 @@
+9/19
+Firefox snap build
+
 9/16
 gen new joe pw
 
-slplit out firstboot.sh and startup.sh - run startup and copy to rc.local
+d(as echo to rc.local) split out firstboot.sh and startup.sh - run startup and copy to rc.local
 
 eracks
 wp

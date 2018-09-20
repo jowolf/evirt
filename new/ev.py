@@ -118,6 +118,12 @@ class Section (object):
         mon     = decls.get ('mon', "-monitor telnet:127.0.0.1:%s,server,nowait,nodelay" % monport)
         vnc     = decls.get ('vnc', "-vnc :%s" % vncport)
         rdpport = decls.get ('rdpport', (39000 + iplast))
+        parms   = decls.get ('parms', '')
+
+        # configure hostdirs / passthru folder(s)
+
+        for passthru in decls.get ('hostdirs', [])
+          parms += "-fsdev local,security_model=passthrough,id=fsdev0,path=%s -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare " % passthru
 
         ud = dict (
             installdir = installpath,
@@ -139,6 +145,7 @@ class Section (object):
             mon     = mon,
             vnc     = vnc,
             rdpport = rdpport,
+            parms   = parms,
             #date    = datetime.date.today().isoformat(),
             date    = datetime.datetime.today().ctime(),
 
@@ -170,10 +177,12 @@ class Section (object):
             if os.access (f, os.R_OK):
               decls ['file%d' % (n+1)] =   \
                 ("- path: %s\n" % (f if f.startswith('/') else os.path.join ('/home', user, f)))  + \
-                ("    owner: %s\n" % user) + \
-                 "    permissions: '0770'\n" + \
                  "    content: |\n"     + \
                  ''.join ([('      ' + lin) for lin in open(f)])
+                # owner nfg: cloud-init can't find joe
+                # ("    owner: %s\n" % user) + \
+                # "    permissions: '0770'\n" + \
+                #
                 # so that the embedded dest in the existing yaml looks like this, with a current indent of 4:
                 #$file1
                 # ...

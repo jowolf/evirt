@@ -63,6 +63,8 @@ content: |
         touch PRECONFIG_BASH_HISTORY
         echo tail -f /var/log/cloud-init-output.log >> /home/$user/.bash_history
         echo less /var/log/cloud-init-output.log >> /home/$user/.bash_history
+        echo less /var/log/cloud-init.log >> /home/$user/.bash_history
+        echo sudo netstat -antp >> /home/$user/.bash_history
         echo DONE >> PRECONFIG_BASH_HISTORY
 
         # now used only for salt
