@@ -1,0 +1,30 @@
+section: declarations
+action:
+  load: declarations
+
+vmname: Win7
+ext: qc2
+#ext: img
+
+iplast: 0  # 0 implies local / rdesktop access
+# So for local / rdesktop use, no need for net / IP address / Macaddr:
+net: "-net nic -net user,hostfwd=tcp::2222-:22"
+#net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:8000"
+#net: "-netdev user,id=nic1,hostfwd=tcp::2222-:22 -device virtio-net,netdev=nic1"
+
+user: joe
+passwd: '$6$rounds=4096$9HeOrRyXEKcTYA5h$mjWahfdV6X.lIiyDwRc/6hXv.7UJCH55XZbHgOOTG3yRh/3vOg5iEukKwYV8kURYtE.GuE/SGI0sUCSAqAgkS.'
+key: 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAvYqSpJvAKMqxSa9Mzhdw7pFk/UOzEOith8UolvC5HpeRieZFwPdXeEDbsVSXlzQqy0v1i226W8+CPX9JX82VWI2RZIkB3sJq3AEELO3pDbDe/Uc1WsTzbN6QUBlpl2OvZB0bBvkGbbATUU2xXefDV/g3ma4k1HkiQIAB6Ymw6XM8+5iznhx8ERsUUE9V9NGc52ujAr4Sz5E+wgLxZXWKW25IiPfAMOHvlEzfiL4S3Q8YruSy337C54ttf8VFwBHcotzybhOIUEqCqsAc70RLlhNpafNLx/sJD/yJ+R3AO0z6Brm8eVeax56gSs4eIdY23tufX2drL8ZnY1LNNhdV9w== joe@STUDIO'
+
+size: 20G
+ram: 2G
+
+hdb: ""
+#parms: "-device usb-tablet "  # No 'usb-bus' bus found for device 'usb-tablet'
+parms: "-usbdevice tablet "
+drives: "-drive file=Win7.qc2"
+---
+section: parents
+action:
+  inherit:
+    - windows.yaml

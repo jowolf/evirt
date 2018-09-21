@@ -1,0 +1,59 @@
+section: declarations
+action:
+  load: declarations
+image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
+
+#vmname: default is to use basename of curdir
+#iplast: 0  # 0 implies local / rdesktop access - empty / undeclared implies 0
+# So for local / rdesktop use, no need for net / IP address / Macaddr:
+#net: "-net nic -net user,hostfwd=tcp::2222-:22"
+#net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:8000"
+#net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::80-:80,hostfwd=tcp::443-:443"
+net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:80,hostfwd=tcp::8443-:443"
+#net: "-netdev user,id=nic1,hostfwd=tcp::2222-:22 -device virtio-net,netdev=nic1"
+
+user: joe
+passwd: '$6$rounds=4096$9HeOrRyXEKcTYA5h$mjWahfdV6X.lIiyDwRc/6hXv.7UJCH55XZbHgOOTG3yRh/3vOg5iEukKwYV8kURYtE.GuE/SGI0sUCSAqAgkS.'
+key: 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAvYqSpJvAKMqxSa9Mzhdw7pFk/UOzEOith8UolvC5HpeRieZFwPdXeEDbsVSXlzQqy0v1i226W8+CPX9JX82VWI2RZIkB3sJq3AEELO3pDbDe/Uc1WsTzbN6QUBlpl2OvZB0bBvkGbbATUU2xXefDV/g3ma4k1HkiQIAB6Ymw6XM8+5iznhx8ERsUUE9V9NGc52ujAr4Sz5E+wgLxZXWKW25IiPfAMOHvlEzfiL4S3Q8YruSy337C54ttf8VFwBHcotzybhOIUEqCqsAc70RLlhNpafNLx/sJD/yJ+R3AO0z6Brm8eVeax56gSs4eIdY23tufX2drL8ZnY1LNNhdV9w== joe@STUDIO'
+
+#permanent: True  # defaults to false
+#workdir: .evirt
+size: 20G
+ram: 2G
+#vnc: ""  # uncomment to turn off vnc
+
+
+# list of run-cmds for cloud-init - $cmd1 $cmd2 ...
+#commands: |
+#  cd $user
+#  touch DOING_GIT_CLONE
+#  git clone https://github.com/mattermost/mattermost-docker.git
+#  touch DOING_BUILD
+#  cd mattermost-docker
+#  docker-compose up --build
+#  touch DONE`
+
+files:
+  # for build only
+  - startup.sh
+  - docker-compose.yml
+  # same as git_repo_key, below:
+  #- /home/joe/.ssh/jjw-salt-deploy.id_rsa
+  - /home/$user/.config/mc/ini
+ #- $user/.ssh/id_rsa
+  #- .ssh/id_rsa_jjw
+  #- .ssh/id_rsa_eracks
+
+#Todo:
+#salted: False
+
+#git_repo: git@github.com:jowolf/jjw-salt-master.git
+#git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
+#git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
+
+---
+section: parents
+action:
+  inherit:
+    - base.yaml
+    - build.yaml
