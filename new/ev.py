@@ -122,8 +122,14 @@ class Section (object):
 
         # configure hostdirs / passthru folder(s)
 
-        for passthru in decls.get ('hostdirs', [])
-          parms += "-fsdev local,security_model=passthrough,id=fsdev0,path=%s -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare " % passthru
+        for n,path in enumerate (decls.get ('hostdirs', [])):
+          path = Template (path).safe_substitute (decls)
+          if os.access (path, os.R_OK):
+            parms += "-fsdev local,security_model=passthrough,id=fsdev%i,path=%s -device virtio-9p-pci,id=fs%i,fsdev=fsdev%i,mount_tag=hostshare%i " % (n,path,n,n,n)
+          else:
+            print ("Warning - path not found: %s - skipping" % path)
+
+        # update locals back to decls dict
 
         ud = dict (
             installdir = installpath,
@@ -157,7 +163,8 @@ class Section (object):
         if trace & 16: print ('UPDATE', ud)
         decls.update (ud)
 
-        # add files
+        # add files list
+
         decls ['file1'] = ''
         decls ['file2'] = ''
         decls ['file3'] = ''
