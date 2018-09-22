@@ -1,9 +1,16 @@
 # JJW additions:
 *~
 scripts/createvm/eRacks*.50
-*.img
 new/env/*
-new/.evirt/*
+.evirt/
+/nfg
+evm
+stuffit
+*.img
+*.qc2
+*.qcow2
+*.xz
+*.kate-swp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

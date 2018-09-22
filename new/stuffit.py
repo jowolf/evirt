@@ -1,4 +1,3 @@
-#!/home/joe/evirt/new/env/bin/python
 # - coding: UTF8 -
 
 import sys, os, fcntl, termios
@@ -12,7 +11,7 @@ def getParentPidList():
       #print ([l.split (':') for l in open ('/proc/%s/status' % pid).readlines() if ':' in l])
       pid = int (dict (l.split (':') for l in open ('/proc/%s/status' % pid).readlines()) ['PPid'].strip())
 
-    print (results)
+    #print (results)
     return results
 
 # see:
@@ -79,7 +78,9 @@ for pid in getParentPidList():
   try:
     #tty = os.readlink('/proc/%s/fd/%s' % (pid, sys.__stdin__.fileno()))
     tty = os.readlink('/proc/%s/fd/%s' % (pid, 0))  # 0 seems to always be stdin
-    print (tty)
+    #print (tty)
+    if tty.startswith ('pipe:'):
+        continue
 
     with open(tty, 'w') as fd:
       for c in ' '.join (sys.argv [1:]):

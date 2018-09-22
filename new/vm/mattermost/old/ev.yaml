@@ -21,40 +21,26 @@ size: 20G
 ram: 2G
 #vnc: ""  # uncomment to turn off vnc
 
+git_repo: https://github.com/mattermost/mattermost-docker.git
+#git_repo: git@github.com:jowolf/jjw-salt-master.git
+#git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
+git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
 
-# list of run-cmds for cloud-init - $cmd1 $cmd2 ...
-#commands: |
-#  cd $user
-#  touch DOING_GIT_CLONE
-#  git clone https://github.com/mattermost/mattermost-docker.git
-#  touch DOING_BUILD
-#  cd mattermost-docker
-#  docker-compose up --build
-#  touch DONE`
+#Todo:
+#salted: False
+#commands: []  # list or run-cmds for cloud-init - $cmd1 $cmd2 ...
 
 files:
-  # for build only
-  #- startup.sh
-  #- docker-compose.yaml
   # same as git_repo_key, above:
   - /home/joe/.ssh/jjw-salt-deploy.id_rsa
-  #- /home/joe/.ssh/id_rsa_eracks-deploy
   #- docker-compose.yaml
   #- /home/joe/eracks11/conf/docker-compose.yml
   #- $user/.ssh/id_rsa
   #- .ssh/id_rsa_jjw
   #- .ssh/id_rsa_eracks
-
-#Todo:
-#salted: False
-
-git_repo: git@github.com:jowolf/jjw-salt-master.git
-#git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
-git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
-
 ---
 section: parents
 action:
   inherit:
     - base.yaml
-    #- build.yaml
+    - build.yaml

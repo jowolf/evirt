@@ -1,3 +1,78 @@
+9/19
+Firefox snap build
+
+9/16
+gen new joe pw
+
+d(as echo to rc.local) split out firstboot.sh and startup.sh - run startup and copy to rc.local
+
+eracks
+wp
+nextcloud
+16.04 britta
+tlg
+
+9/15
+t su $user
+p files section should have d owner, perms, dest
+t go.sh and stuffit
+
+check image for basename automaticaly, no need for 2 separate decls
+
+if '.' in cwd: vm,ip=cwd.split('.')?
+
+@willow st: Why not put whole vm tree in evirt?  setup should symlink out into /home/vm (and /vm)
+
+
+9/14
+t fix start, perms, stop, kill, tap name for 0 IP
+n private_repo or just commands section
+p log commands into all-caps touch files
+
+test netdev virtio
+
+win7 qb - install virtio drivers
+
+implement --trace opt
+
+
+9/13/18 Todo:
+dl base images to known dir, reuse - currently as of today have to copy manually to $installdir
+
+have default / all not require ev.yaml -
+  - this will require separation of copy/do from load -
+
+
+9/5/18
+
+Copied jw5-nextcloud as new base, copied base to build
+
+Todo: finish / test build, files, git(lab) repo(s)
+
+clean up windows.yaml
+
+install wdos virtio drivers, make canon Win7
+
+use mattermost repo and docker-compose as pilot!
+
+
+9/2/18
+work on inherit, splitout of base section(s)
+want to have importable files - docker compose, keys, etc
+
+declarations class?  for inherit, defaults, smart entries, etc?
+
+iplast: 0 should mean remote desktop instance (10.0.2.15 dhcp)
+d #vmname defaults to basename curdir
+
+10p
+d Warning: file not found, not including (for ssh keys, docker-compose.yaml, etc)
+(Instead of fault)
+
+Need to NOT write anything unless the command says to - help, <default / show>, err, etc
+so need more clg research
+
+
 9/1/18 epiphany - allow nestable inherit: command, check <install>/templates dir
 - Windows7-remote-desktop
 - ubuntu1604
@@ -11,6 +86,7 @@
 Implem newvm command - mkdir + pre-pop w/example script
 eg:
 evm newvm serog-1804 [ubuntu 18.04 britta]
+
 
 7/21/18 Todo:
 - allow for local-per-machine evirt config
@@ -31,7 +107,7 @@ implem:
 6/25/18 See Public Bridge Section, here:
 https://www.linux-kvm.org/page/Networking
 
-- permission issues: 
+- permission issues:
 chown :joe /dev/net/tun
 
 n edit /etc/qemu-ifup
@@ -54,17 +130,17 @@ linux kernel cmdline vga parm
 qemu grub parms
 
 So this works! with bionic kernel:
-sudo kvm -display sdl -vga std -kernel /vmlinuz  -append vga=0x31b nextcloud.img 
+sudo kvm -display sdl -vga std -kernel /vmlinuz  -append vga=0x31b nextcloud.img
 https://unix.stackexchange.com/questions/71231/grub2-and-kernel-vga-parameter
 but panics - no initrd, root, etc
 
 it even works without the -display and -vga parms:
-joe@studio-bionic:/home/vm/nextcloud$ sudo kvm -kernel /vmlinuz  -append vga=0x31b nextcloud.img 
+joe@studio-bionic:/home/vm/nextcloud$ sudo kvm -kernel /vmlinuz  -append vga=0x31b nextcloud.img
 
 Curses does not work, only gives "1280x1024 graphics mode :-("
 
 But this does:
-joe@studio-bionic:/home/vm/nextcloud$ sudo kvm -display curses -kernel /vmlinuz  -append vga=ask nextcloud.img 
+joe@studio-bionic:/home/vm/nextcloud$ sudo kvm -display curses -kernel /vmlinuz  -append vga=ask nextcloud.img
 
 boots into interactive VGA ask screen :-)
 

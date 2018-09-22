@@ -1,0 +1,12 @@
+instance-id: my-ubuntu-id-v11;
+network-interfaces: |
+  auto eth0
+  iface eth0 inet static
+    address 192.168.1.41
+    #network 216.172.134.0
+    netmask 255.255.255.0
+    #broadcast 216.172.134.255
+    gateway 192.168.1.1
+    dns-nameservers 72.13.81.2 72.13.91.2 8.8.8.8 4.2.2.1 4.2.2.2 4.2.2.3 
+local-hostname: my-ubuntu-host-11.eracks.com
+#hostname: myubuntuhost

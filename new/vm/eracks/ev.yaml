@@ -1,14 +1,13 @@
 section: declarations
 action:
   load: declarations
-#image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
-image: ubuntu-18.04-server-cloudimg-amd64.img
+image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
 
 #vmname: default is to use basename of curdir
 #iplast: 0  # 0 implies local / rdesktop access - empty / undeclared implies 0
 # So for local / rdesktop use, no need for net / IP address / Macaddr:
-net: "-net nic -net user,hostfwd=tcp::2222-:22"
-#net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:8000"
+#net: "-net nic -net user,hostfwd=tcp::2222-:22"
+net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:8000"
 #net: "-netdev user,id=nic1,hostfwd=tcp::2222-:22 -device virtio-net,netdev=nic1"
 
 user: joe
@@ -21,26 +20,14 @@ size: 20G
 ram: 2G
 #vnc: ""  # uncomment to turn off vnc
 
-
-# list of run-cmds for cloud-init - $cmd1 $cmd2 ...
-#commands: |
-#  cd $user
-#  touch DOING_GIT_CLONE
-#  git clone https://github.com/mattermost/mattermost-docker.git
-#  touch DOING_BUILD
-#  cd mattermost-docker
-#  docker-compose up --build
-#  touch DONE`
-
 files:
   # for build only
-  #- startup.sh
-  #- docker-compose.yaml
-  # same as git_repo_key, above:
+  - startup.sh
+  - docker-compose.yml
   - /home/joe/.ssh/jjw-salt-deploy.id_rsa
-  #- /home/joe/.ssh/id_rsa_eracks-deploy
-  #- docker-compose.yaml
-  #- /home/joe/eracks11/conf/docker-compose.yml
+  - /home/joe/.ssh/eracks-deploy
+  - /home/joe/.ssh/id_rsa_gitlab
+  - /home/$user/.config/mc/ini
   #- $user/.ssh/id_rsa
   #- .ssh/id_rsa_jjw
   #- .ssh/id_rsa_eracks
@@ -57,4 +44,4 @@ section: parents
 action:
   inherit:
     - base.yaml
-    #- build.yaml
+    - build.yaml

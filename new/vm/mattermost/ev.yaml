@@ -1,14 +1,15 @@
 section: declarations
 action:
   load: declarations
-#image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
-image: ubuntu-18.04-server-cloudimg-amd64.img
+image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
 
 #vmname: default is to use basename of curdir
 #iplast: 0  # 0 implies local / rdesktop access - empty / undeclared implies 0
 # So for local / rdesktop use, no need for net / IP address / Macaddr:
-net: "-net nic -net user,hostfwd=tcp::2222-:22"
+#net: "-net nic -net user,hostfwd=tcp::2222-:22"
 #net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:8000"
+#net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::80-:80,hostfwd=tcp::443-:443"
+net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:80,hostfwd=tcp::8443-:443"
 #net: "-netdev user,id=nic1,hostfwd=tcp::2222-:22 -device virtio-net,netdev=nic1"
 
 user: joe
@@ -34,27 +35,25 @@ ram: 2G
 
 files:
   # for build only
-  #- startup.sh
-  #- docker-compose.yaml
-  # same as git_repo_key, above:
-  - /home/joe/.ssh/jjw-salt-deploy.id_rsa
-  #- /home/joe/.ssh/id_rsa_eracks-deploy
-  #- docker-compose.yaml
-  #- /home/joe/eracks11/conf/docker-compose.yml
-  #- $user/.ssh/id_rsa
+  - startup.sh
+  - docker-compose.yml
+  # same as git_repo_key, below:
+  #- /home/joe/.ssh/jjw-salt-deploy.id_rsa
+  - /home/$user/.config/mc/ini
+ #- $user/.ssh/id_rsa
   #- .ssh/id_rsa_jjw
   #- .ssh/id_rsa_eracks
 
 #Todo:
 #salted: False
 
-git_repo: git@github.com:jowolf/jjw-salt-master.git
+#git_repo: git@github.com:jowolf/jjw-salt-master.git
 #git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
-git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
+#git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
 
 ---
 section: parents
 action:
   inherit:
     - base.yaml
-    #- build.yaml
+    - build.yaml

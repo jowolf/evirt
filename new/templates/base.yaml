@@ -1,0 +1,192 @@
+section: start.sh
+action:
+  command:
+    start:
+        help: Start the VM, activate the tap interface first, show result if failed
+content: |
+  # start.sh generated $date by eVirt
+
+  #tapif=tap-$iplast now set in decls
+  user=`whoami`
+  trace=$1
+
+  if test -n trace; then {
+    echo TAP INTERFACE $tapif USER $user
+  } fi
+
+  sudo ip tuntap add $tapif mode tap user $user
+  sudo ip link set $tapif up
+  sleep 0.5s
+  sudo ip link set $tapif master br0
+
+  log=$vmname.log
+  kvm -daemonize -d unimp,guest_errors -D $log $parms -m $ram $cpu $vnc $mon $net $drives
+  result=$?
+
+  if test $result -ne 0; then {
+    echo "FAILED with code $result: kvm -daemonize -d unimp,guest_errors -D $log $parms -m $ram $cpu $vnc $mon $net $drives"
+  } fi
+---
+section: stop.sh
+action:
+  command:
+    stop:
+        help: Stop the VM gracefully, deactivate the tap interface
+content: |
+  # stop.sh generated $date by eVirt
+
+  (echo "system_powerdown"; sleep 5; echo "quit" ) | telnet 127.0.0.1 $((23000+$iplast))
+  sleep 2
+  ip tuntap del $tapif mode tap
+  echo $vmname stopped.
+---
+section: reboot.sh
+action:
+  command:
+    reboot:
+        help: Reboot the VM gracefully, using system_reset
+content: |
+  # reboot.sh generated $date by eVirt
+
+  echo "system_reset" | telnet 127.0.0.1 $((23000+$iplast))
+  echo $vmname rebooted.
+---
+section: kill.sh
+action:
+  command:
+    kill:
+        help: Kill the VM process, deactivate the tap interface
+content: |
+  # kill.sh generated $date by eVirt
+
+  # nope, cut doesnt deal with eading spaces well - it moves the index
+  # kill -HUP $(ps ax |grep $vmname |grep -v grep | cut -f 1 -d ' ')
+
+  # so use awk
+  sudo kill -HUP $(ps ax |grep $vmname |grep -v grep | awk '{ print $1; }' )
+  ip tuntap del $tapif mode tap
+  echo $vmname killed.
+---
+section: status.sh
+action:
+  command:
+    status:
+        help: Show the status of the VM and image
+content: |
+  # status.sh generated $date by eVirt
+
+  trace=$1
+
+  if test -s $vmname.log; then {
+    echo "$vmname.log: `tail $vmname.log`"
+    echo
+  } fi
+
+  if test -s evirt.log; then {
+    echo "evirt.log: `tail evirt.log`"
+    echo
+  } fi
+
+  s=`sudo ps -axw | grep $vmname |grep -v grep`
+
+  if test "$trace"; then {
+    echo TRACE \"$trace\"
+    echo S $s
+    echo TEST `test -n s`
+  } fi
+
+  echo "Image info: `qemu-img info $vmname.$ext`"
+  echo
+
+  if test "$s"; then {
+    echo VM is running:
+    echo $s
+  } else {
+    echo VM not running.
+    #echo
+    #echo "Image info: `qemu-img info $vmname.$ext`"
+  } fi
+---
+section: mount.sh
+action:
+  command:
+    mount:
+        help: Mount a guest file system to access the VM
+content: |
+  # mount.sh generated $date by eVirt
+  echo Mounting guest FS for $vmname
+  mkdir -p .mount
+  guestmount -a $vmname.$ext -i --rw .mount
+---
+section: unmount.sh
+action:
+  command:
+    unmount:
+        help: Unmount a previously mounted guest file system
+content: |
+  # unmount.sh generated $date by eVirt
+  echo Unmounting guest FS for $vmname
+  umount .mount
+  rmdir .mount
+---
+section: all.sh
+action:
+  command:
+    #default:
+    all:
+        help: Show all running VMs (requires sudo capabilities)
+content: |
+  # all.sh generated $date by eVirt
+  # default.sh generated $date by eVirt
+
+  #ps axw | grep kvm | grep -v grep
+  #sudo netstat -antp
+
+  echo Running WMs:
+  ps axw | grep qemu | grep -v grep
+  echo
+
+  echo VM Ports:
+  sudo netstat -antp |grep qemu
+  #echo
+---
+section: monitor.sh
+action:
+  command:
+    monitor:
+        help: Telnet to the KVM monitor interface
+content: |
+  # monitor.sh generated $date by eVirt
+  # d echo Cut and paste (todo: stuffit) :
+  sudo stuffit telnet 127.0.0.1 $((23000+$iplast))
+---
+section: ssh.sh
+action:
+  command:
+    ssh:
+        help: Local SSH into the VM
+content: |
+  # ssh.sh generated $date by eVirt
+
+  privkey=$privkey
+
+  ssh-keygen -f "/home/$user/.ssh/known_hosts" -R "[127.0.0.1]:2222"
+
+  if test ${privkey} && test -e $privkey; then
+    #echo 'ssh -t -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1 < `tty`'
+    sudo stuffit ssh -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1
+  else
+    #echo 'ssh -t -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1 < `tty`'
+    sudo stuffit ssh -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1
+  fi
+---
+section: vnc.sh
+action:
+  command:
+    vnc:
+        help: Run VNC (Vinagre) on local VM
+content: |
+  # vnc.sh generated $date by eVirt
+
+  sudo stuffit vinagre 127.0.0.1:59000
+  # todo: enh for IP and port
