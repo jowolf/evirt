@@ -127,7 +127,8 @@ class Section (object):
           if os.access (path, os.R_OK):
             parms += "-fsdev local,security_model=passthrough,id=fsdev%i,path=%s -device virtio-9p-pci,id=fs%i,fsdev=fsdev%i,mount_tag=hostshare%i " % (n,path,n,n,n)
           else:
-            print ("Warning - path not found: %s - skipping" % path)
+            print ("Warning - path not found: %s - creating" % path)
+            os.makedirs (path)
 
         # update locals back to decls dict
 

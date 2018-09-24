@@ -1,3 +1,36 @@
+9/22 struggling with hostshare<n> :
+- Available mount tags can be seen by reading /sys/bus/virtio/drivers/9pnet_virtio/virtio<n>/mount_tag files.
+
+https://www.kernel.org/doc/Documentation/filesystems/9p.txt
+
+ideas: 
+- log vm spinup progress to shared folder
+- look for and test the above
+- mkdir vm local folders in hostdir list
+
+for f in /sys/bus/virtio/drivers/9pnet_virtio/virtio*; do 
+  echo $f 
+  cat $f/mount_tag
+  mtag=$f/mount_tag
+  mkdir /$mtag
+  chown $user:$user /$mtag
+  mount -t 9p $mtag /
+  echo 
+  
+  
+  no - remember we need to reunite the declared hostdirs - 
+  
+  for i in len(lostdirs):
+    vfy mtag(i)
+    d = hostdirs [i]
+    mkdir $d
+    chown u:u $d
+    mount mtag d
+done
+
+
+
+
 9/19
 Firefox snap build
 

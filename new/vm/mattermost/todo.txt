@@ -1,0 +1,15 @@
+9/21/18 JJW
+
+set up volumes in outer host - 
+t - won't git fail if the dir is there already? (d so remove the . )
+t - mount in the guest will need the mkdir done in the host then
+y - but then the volumes have to be outside the repo - see #1
+
+Idea: Tie localtime to host, just like docker ties it to rhe parent?
+
+t Possible soln:  simply remove the "." from volumes - 
+
+Todo 9/23/18:
+- put the volumes at / , mount hostshare<n> to /volumes, others in startup
+- see main notes for /sys/ tree location and bash snippet
+- test.

@@ -54,48 +54,48 @@ content: |
       content: |
         cd /home/$user
 
-        echo DOING_KEYSCAN
-        touch DOING_KEYSCAN
+        echo 1_DOING_KEYSCAN
+        touch 1_DOING_KEYSCAN
         sudo -u $user ssh-keyscan -H github.com >>/home/$user/.ssh/known_hosts
-        echo DONE >> DOING_KEYSCAN
+        echo DONE >> 1_DOING_KEYSCAN
 
-        echo PRECONFIG_BASH_HISTORY
-        touch PRECONFIG_BASH_HISTORY
+        echo 2_PRECONFIG_BASH_HISTORY
+        touch 2_PRECONFIG_BASH_HISTORY
         echo tail -f /var/log/cloud-init-output.log >> /home/$user/.bash_history
         echo less /var/log/cloud-init-output.log >> /home/$user/.bash_history
         echo less /var/log/cloud-init.log >> /home/$user/.bash_history
         echo sudo netstat -antp >> /home/$user/.bash_history
-        echo DONE >> PRECONFIG_BASH_HISTORY
+        echo DONE >> 2_PRECONFIG_BASH_HISTORY
 
         # now used only for salt
-        echo CLONE_GIT_REPO
-        touch CLONE_GIT_REPO
-        #ssh-agent bash -c 'ssh-add $git_repo_key && git clone -q $git_repo' >> CLONE_GIT_REPO
+        echo 3_CLONE_GIT_REPO
+        touch 3_CLONE_GIT_REPO
+        #ssh-agent bash -c 'ssh-add $git_repo_key && git clone -q $git_repo' >> 3_CLONE_GIT_REPO
         # do them separately so we can do pub repos w/o key
-        ssh-agent bash -c 'ssh-add $git_repo_key >> CLONE_GIT_REPO'
-        ssh-agent bash -c 'git clone -q $git_repo >> CLONE_GIT_REPO'
-        echo DONE >> CLONE_GIT_REPO
+        ssh-agent bash -c 'ssh-add $git_repo_key >> 3_CLONE_GIT_REPO 2>&1'
+        ssh-agent bash -c 'git clone -q $git_repo >> 3_CLONE_GIT_REPO 2>&1'
+        echo DONE >> 3_CLONE_GIT_REPO
 
-        echo SETTING_UP_DOCKER_COMPOSE
-        touch SETTING_UP_DOCKER_COMPOSE
+        echo 4_SETTING_UP_DOCKER_COMPOSE
+        touch 4_SETTING_UP_DOCKER_COMPOSE
         # sudo apt-get install python-virtualenv
         virtualenv -v env
         #./go.sh
         . env/bin/activate
-        pip install docker-compose >> SETTING_UP_DOCKER_COMPOSE
-        echo DONE >> SETTING_UP_DOCKER_COMPOSE
+        pip install docker-compose >> 4_SETTING_UP_DOCKER_COMPOSE 2>&1
+        echo DONE >> 4_SETTING_UP_DOCKER_COMPOSE
 
-        echo CHOWN_$user
-        touch CHOWN_$user
+        echo 5_CHOWN_$user
+        touch 5_CHOWN_$user
         sudo chown -R $user:$user /home/$user
-        echo DONE >> CHOWN_$user
+        echo DONE >> 5_CHOWN_$user
 
-        echo DOING_STARTUP_COMMANDS
-        sudo -u $user sh -c "sh startup.sh >> DOING_STARTUP_COMMANDS"
-        echo DONE >> DOING_STARTUP_COMMANDS
+        echo 6_DOING_STARTUP_COMMANDS
+        sudo -u $user sh -c "sh startup.sh >> 6_DOING_STARTUP_COMMANDS 2>&1"
+        echo DONE >> 6_DOING_STARTUP_COMMANDS
 
         #echo DOING_FIRSTBOOT_COMMANDS
-        #sudo -u $user sh -c "sh startup.sh >> DOING_FIRSTBOOT_COMMANDS"
+        #sudo -u $user sh -c "sh startup.sh >> DOING_FIRSTBOOT_COMMANDS 2>&1"
         #echo DONE >> DOING_FIRSTBOOT_COMMANDS
         exit
     $file1

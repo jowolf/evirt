@@ -23,6 +23,11 @@ ram: 2G
 #vnc: ""  # uncomment to turn off vnc
 
 
+hostdirs:
+  - volumes
+  - spinup
+  - test
+
 # list of run-cmds for cloud-init - $cmd1 $cmd2 ...
 #commands: |
 #  cd $user
