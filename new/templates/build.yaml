@@ -90,9 +90,11 @@ content: |
         sudo chown -R $user:$user /home/$user
         echo DONE >> 5_CHOWN_$user
 
-        echo 6_DOING_STARTUP_COMMANDS
-        sudo -u $user sh -c "sh startup.sh >> 6_DOING_STARTUP_COMMANDS 2>&1"
-        echo DONE >> 6_DOING_STARTUP_COMMANDS
+        if test -e startup.sh; then
+          echo 6_DOING_STARTUP_COMMANDS
+          sudo -u $user sh -c "sh startup.sh >> 6_DOING_STARTUP_COMMANDS 2>&1"
+          echo DONE >> 6_DOING_STARTUP_COMMANDS
+        fi
 
         #echo DOING_FIRSTBOOT_COMMANDS
         #sudo -u $user sh -c "sh startup.sh >> DOING_FIRSTBOOT_COMMANDS 2>&1"
