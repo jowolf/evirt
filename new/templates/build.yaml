@@ -40,11 +40,32 @@ content: |
     - git
     - docker.io
   write_files:
+    - path: /usr/local/bin/hostmounts.sh
+      permissions: '0755'
+      content: |
+        #!/bin/bash
+
+        for f in /sys/bus/virtio/drivers/9pnet_virtio/virtio*; do
+          echo VALID MOUNT TAGS >> 6_MOUNTING_HOSTSHARES
+          echo $f >> 6_MOUNTING_HOSTSHARES
+          mtag=`cat $f/mount_tag`
+          echo $mtag >> 6_MOUNTING_HOSTSHARES
+        done
+
+        n=0
+        for p in $hostshares; do    # for f in a b c d e; do
+          echo MAPPING $n $p >> 6_MOUNTING_HOSTSHARES
+          mkdir -p /home/$user/$p
+          echo mount -t 9p -o trans=virtio,version=9p2000.L,uname=joe hostshare$n /home/$user/$p >> 6_MOUNTING_HOSTSHARES
+          mount -t 9p -o trans=virtio,version=9p2000.L,uname=joe hostshare$n /home/$user/$p >> 6_MOUNTING_HOSTSHARES
+          mount >> 6_MOUNTING_HOSTSHARES
+          (( ++n ))
+        done
     - path: /home/$user/go.sh
       permissions: '0770'
       content: |
-        #!/bin/env python
-        import os, fcntl, termios
+        #!/usr/bin/python
+        import sys, os, fcntl, termios
         tty = os.ttyname(sys.stdin.fileno())
         with open (tty, 'w') as fd:
           for c in ". env/bin/activate\n":
@@ -90,10 +111,34 @@ content: |
         sudo chown -R $user:$user /home/$user
         echo DONE >> 5_CHOWN_$user
 
+        echo 6_MOUNTING_HOSTSHARES
+
+        hostmounts.sh
+
+        #for f in /sys/bus/virtio/drivers/9pnet_virtio/virtio*; do
+        #  echo VALID MOUNT TAGS >> 6_MOUNTING_HOSTSHARES
+        #  echo $f >> 6_MOUNTING_HOSTSHARES
+        #  mtag=`cat $f/mount_tag`
+        #  echo $mtag >> 6_MOUNTING_HOSTSHARES
+        #done
+
+        #n=0
+        #for p in $hostshares; do    # for f in a b c d e; do
+        #  echo MAPPING $n $p >> 6_MOUNTING_HOSTSHARES
+        #  mkdir -p /home/$user/$p
+        #  echo mount -t 9p -o trans=virtio,version=9p2000.L,uname=joe hostshare$n /home/$user/$p >> 6_MOUNTING_HOSTSHARES
+        #  mount -t 9p -o trans=virtio,version=9p2000.L,uname=joe hostshare$n /home/$user/$p >> 6_MOUNTING_HOSTSHARES
+        #  mount >> 6_MOUNTING_HOSTSHARES
+        #  (( ++n ))
+        #done
+
+        echo DONE >> 6_MOUNTING_HOSTSHARES
+
+
         if test -e startup.sh; then
-          echo 6_DOING_STARTUP_COMMANDS
-          sudo -u $user sh -c "sh startup.sh >> 6_DOING_STARTUP_COMMANDS 2>&1"
-          echo DONE >> 6_DOING_STARTUP_COMMANDS
+          echo 7_DOING_STARTUP_COMMANDS
+          sudo -u $user sh -c "sh startup.sh >> 7_DOING_STARTUP_COMMANDS 2>&1"
+          echo DONE >> 7_DOING_STARTUP_COMMANDS
         fi
 
         #echo DOING_FIRSTBOOT_COMMANDS
@@ -118,27 +163,27 @@ content: |
     - bash cloud-init-runcmd.sh >>RUNNING_RUNCMD_SCRIPT
     - echo DONE >>RUNNING_RUNCMD_SCRIPT
 ---
-section: metadata.yaml
-action:
-  save: $workdir
-content: |
-  #dsmode: local
-  instance-id: $vmname;
-  network-interfaces: |
-    auto ens3
-    #iface ens3 inet dhcp
-    iface ens3 inet static
-      # for local VMs, at least on LGram, this is the lxc bridge nw
-      address 10.0.3.$iplast
-    #  address 216.172.133.$iplast
-    #  #network 216.172.133.0
-      netmask 255.255.255.0
-    #  #broadcast 216.172.133.255
-    #  gateway 216.172.133.1
-      gateway 10.0.3.1
-      dns-nameservers 72.13.81.2 72.13.91.2 1.1.1.1 8.8.8.8 4.2.2.1 4.2.2.2 4.2.2.3
-  local-hostname: $vmname
----
+#section: metadata.yaml
+#action:
+#  save: $workdir
+#content: |
+#  #dsmode: local
+#  instance-id: $vmname;
+#  network-interfaces: |
+#    auto ens3
+#    #iface ens3 inet dhcp
+#    iface ens3 inet static
+#      # for local VMs, at least on LGram, this is the lxc bridge nw
+#      address 10.0.3.$iplast
+#    #  address 216.172.133.$iplast
+#    #  #network 216.172.133.0
+#      netmask 255.255.255.0
+#    #  #broadcast 216.172.133.255
+#    #  gateway 216.172.133.1
+#      gateway 10.0.3.1
+#      dns-nameservers 72.13.81.2 72.13.91.2 1.1.1.1 8.8.8.8 4.2.2.1 4.2.2.2 4.2.2.3
+#  local-hostname: $vmname
+#---
 section: download.sh
 action:
   command:
@@ -209,6 +254,10 @@ content: |
   } fi
 
   qemu-img resize $vmname.$ext $size
-  cloud-localds $workdir/cloudinit.img $workdir/userdata.yaml # $workdir/metadata.yaml
+  if test -e $workdir/metadata.yaml; then
+    cloud-localds $workdir/cloudinit.img $workdir/userdata.yaml $workdir/metadata.yaml
+  else
+    cloud-localds $workdir/cloudinit.img $workdir/userdata.yaml
+  fi
   qemu-img convert -O qcow2 -c .evirt/cloudinit.img .evirt/cloudinit.qc2
 

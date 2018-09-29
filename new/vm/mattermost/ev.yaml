@@ -4,13 +4,24 @@ action:
 image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
 
 #vmname: default is to use basename of curdir
-#iplast: 0  # 0 implies local / rdesktop access - empty / undeclared implies 0
+iplast: 50  # 0 implies local / rdesktop access - empty / undeclared implies 0
+
 # So for local / rdesktop use, no need for net / IP address / Macaddr:
 #net: "-net nic -net user,hostfwd=tcp::2222-:22"
 #net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:8000"
 #net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::80-:80,hostfwd=tcp::443-:443"
-net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:80,hostfwd=tcp::8443-:443"
+
+
+# and for fixedIP use, ev.py builds the net line - but requires sudo, and comes up as ens6 (WTF?)
+#net: "-net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::8000-:80,hostfwd=tcp::8443-:443"
 #net: "-netdev user,id=nic1,hostfwd=tcp::2222-:22 -device virtio-net,netdev=nic1"
+
+# Let's try this:
+# nope - requires /usr/lib/qemu/qemu-bridge-helper, which requires setuid and /etc/qemu/bridge.conf with acls:
+# net: "-net bridge −net nic,model=virtio"
+
+# Works, tested:
+net: "-net tap,name=eth0,ifname=$tapif,script=no,downscript=no -net nic,model=virtio"
 
 user: joe
 passwd: '$6$rounds=4096$9HeOrRyXEKcTYA5h$mjWahfdV6X.lIiyDwRc/6hXv.7UJCH55XZbHgOOTG3yRh/3vOg5iEukKwYV8kURYtE.GuE/SGI0sUCSAqAgkS.'
@@ -62,3 +73,4 @@ action:
   inherit:
     - base.yaml
     - build.yaml
+    - fixedip.yaml

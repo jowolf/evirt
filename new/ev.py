@@ -76,7 +76,7 @@ class Section (object):
         Build parms from declarations for start, stop, monitor, etc - ports, etc -
         Could break out into sep module or inh class for bsx rules
         '''
-        def trailing_number(s):
+        def trailing_number(s):  # could split out vmname as well, with or without '.'
             return int (s [len (s.rstrip ('0123456789')):] or '0')
 
         if trace & 2: print ('DECLS:', decls)
@@ -103,15 +103,16 @@ class Section (object):
         if hdd: drives += "-drive file=%s,if=virtio " % hdd
 
         vmdir   = decls.get ('vmdir') or os.getcwd()
+        ipbase  = decls.get ('ipbase', '216.172.133')
         iplast  = decls.get ('iplast', trailing_number (os.path.basename (os.getcwd())))  # last tumbler of IP4 address
-        tapif   = decls.get ('tapif', 'tap-%s' % (iplast or vmname))
+        fullip  = decls.get ('fullip', '%s.%s' % (ipbase, iplast) if iplast else '')
+        #tapif  = decls.get ('tapif', 'tap-%s' % (iplast or vmname))
+        tapif   = decls.get ('tapif', 'tap-%s' % vmname)
         macaddr = decls.get ('macaddr', "de:ad:be:ef:%02d:%02d" % ((iplast / 100), (iplast % 100)))
-        #net     = decls.get ('net', "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast))
-        #net     = decls.get ('net', "-net nic,macaddr=%s -net tap,ifname=tap-%s,helper=/etc/qemu-ifup,downscript=no" % (macaddr, iplast))
-        #net     = decls.get ('net', "-net nic,macaddr=%s -net tap,helper=/etc/qemu-ifup" % macaddr)
-        #net     = decls.get ('net')
-        net     = decls.get ('net',
-                             "-device virtio-net,netdev=net0,mac=%s -netdev tap,id=net0,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast))
+        net     = decls.get ('net', "-net tap,ifname=%s,script=no,downscript=no -net nic,model=virtio,macaddr=%s" % (tapif,macaddr))
+
+        # note: this should be generically done for the whole decls dict:
+        net = Template (net).safe_substitute (decls)
 
         vncport = decls.get ('vncport', (59000 + iplast - 5900))
         monport = decls.get ('monport', (23000 + iplast))
@@ -122,10 +123,12 @@ class Section (object):
 
         # configure hostdirs / passthru folder(s)
 
-        for n,path in enumerate (decls.get ('hostdirs', [])):
+        hostdirs = decls.get ('hostdirs', [])
+        for n,path in enumerate (hostdirs):
           path = Template (path).safe_substitute (decls)
           if os.access (path, os.R_OK):
-            parms += "-fsdev local,security_model=passthrough,id=fsdev%i,path=%s -device virtio-9p-pci,id=fs%i,fsdev=fsdev%i,mount_tag=hostshare%i " % (n,path,n,n,n)
+            #parms += "-fsdev local,security_model=none,id=fsdev%i,path=%s -device virtio-9p-pci,id=fs%i,fsdev=fsdev%i,mount_tag=hostshare%i " % (n,path,n,n,n)
+            parms += "-virtfs local,security_model=mapped-xattr,id=fs%i,path=%s,mount_tag=hostshare%i " % (n,path,n)
           else:
             print ("Warning - path not found: %s - creating" % path)
             os.makedirs (path)
@@ -144,6 +147,8 @@ class Section (object):
             drives  = drives,
             vmdir   = vmdir,
             iplast  = iplast,
+            ipbase  = ipbase,
+            fullip  = fullip,
             tapif   = tapif,
             macaddr = macaddr,
             net     = net,
@@ -153,6 +158,7 @@ class Section (object):
             vnc     = vnc,
             rdpport = rdpport,
             parms   = parms,
+            hostshares = ' '.join (hostdirs),
             #date    = datetime.date.today().isoformat(),
             date    = datetime.datetime.today().ctime(),
 
@@ -163,6 +169,9 @@ class Section (object):
 
         if trace & 16: print ('UPDATE', ud)
         decls.update (ud)
+
+        # Note: this should be generically done for the whole decls dict:
+        decls ['net'] = Template (net).safe_substitute (decls)
 
         # add files list
 

@@ -1,25 +1,60 @@
+9/29 Todo:
+
+- Mattermost SSL
+- drone.io CI/CD
+- eRacks11
+- Nextcloud
+- Wordpress
+
+9/29 For now, only one decl section -
+
+future: will need to separate out reading the Yaml from the actions -
+iow, sep load from _process, similar w/command and _do
+
+9/28
+subtle bug:  .evirt/start.sh is correct, but evm start doubles the parms -
+
+it's because of having 2 decls sections, as referenced in the 'parents'.
+
+- implementing the auto-run-setup based on md5 of create-dates might solve this -
+either run what's there, or rebuild, or both (but sequentially).
+
+
+9/23 todo:
+allow default / evirt files & hostdirs to be added to in ev.py
+test on 18.04 host (bioic) w/security=none (not passthru)
+
+rc.local, hostmounts.sh working -
+- need #!/bin/bash
+- chmod +x
+
+Don't forget:
+- may not always need reboot
+- will need to manually change hostmounts script if any changes in hostdirs
+
+
 9/22 struggling with hostshare<n> :
 - Available mount tags can be seen by reading /sys/bus/virtio/drivers/9pnet_virtio/virtio<n>/mount_tag files.
 
 https://www.kernel.org/doc/Documentation/filesystems/9p.txt
 
-ideas: 
+ideas:
 - log vm spinup progress to shared folder
 - look for and test the above
 - mkdir vm local folders in hostdir list
 
-for f in /sys/bus/virtio/drivers/9pnet_virtio/virtio*; do 
-  echo $f 
+for f in /sys/bus/virtio/drivers/9pnet_virtio/virtio*; do
+  echo $f
   cat $f/mount_tag
   mtag=$f/mount_tag
   mkdir /$mtag
   chown $user:$user /$mtag
   mount -t 9p $mtag /
-  echo 
-  
-  
-  no - remember we need to reunite the declared hostdirs - 
-  
+  echo
+
+
+  no - remember we need to reunite the declared hostdirs -
+
   for i in len(lostdirs):
     vfy mtag(i)
     d = hostdirs [i]

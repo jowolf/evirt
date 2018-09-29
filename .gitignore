@@ -3,6 +3,7 @@
 scripts/createvm/eRacks*.50
 new/env/*
 .evirt/
+volumes/
 /nfg
 evm
 stuffit
