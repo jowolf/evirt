@@ -1,0 +1,147 @@
+section: declarations
+action:
+  load: declarations
+iplast: 161 # 15
+image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
+vmname: wordpress3
+ext: qc2
+user: joe
+passwd: '$6$rounds=4096$9HeOrRyXEKcTYA5h$mjWahfdV6X.lIiyDwRc/6hXv.7UJCH55XZbHgOOTG3yRh/3vOg5iEukKwYV8kURYtE.GuE/SGI0sUCSAqAgkS.'
+key: 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAvYqSpJvAKMqxSa9Mzhdw7pFk/UOzEOith8UolvC5HpeRieZFwPdXeEDbsVSXlzQqy0v1i226W8+CPX9JX82VWI2RZIkB3sJq3AEELO3pDbDe/Uc1WsTzbN6QUBlpl2OvZB0bBvkGbbATUU2xXefDV/g3ma4k1HkiQIAB6Ymw6XM8+5iznhx8ERsUUE9V9NGc52ujAr4Sz5E+wgLxZXWKW25IiPfAMOHvlEzfiL4S3Q8YruSy337C54ttf8VFwBHcotzybhOIUEqCqsAc70RLlhNpafNLx/sJD/yJ+R3AO0z6Brm8eVeax56gSs4eIdY23tufX2drL8ZnY1LNNhdV9w== joe@STUDIO'
+permanent: True
+size: 50G
+ram: 3G
+# for local, no need for net / IP address / Macaddr
+#net: "-net nic -net user,hostfwd=tcp::2222-:22"
+#net: "-netdev tap,helper=/usr/local/libexec/qemu-bridge-helper,id=hn0 -device virtio-net-pci,netdev=hn0,id=tap-161"
+#net: "-netdev tap,script=no,downscript=no,id=net0 -device virtio-net-pci,netdev=net0,id=tap-161"
+#net: "-netdev tap,helper=/etc/qemu-ifup,id=net0 -device virtio-net-pci,netdev=net0,id=nic1"
+#vnc: ""
+#parms: -vga vmware
+#parms: -k en-us
+#parms: -usbdevice tablet
+#parms: -snapshot
+#parms: -boot $boot
+#parms: -cdrom $cdrom
+#parms: -hdb $hdb
+#parms: -hdc $hdc
+#parms: -hdd $hdd
+#date: eval import datetime;datetime.date.today().isoformat()  # $live - this could be either contextual, or a builtin
+workdir: .evirt
+#parms: -display gtk Nope! not compiled in
+#hda: $vmname.img
+hdb: ""
+#hdb: cloudinit.img
+# potential new incremental replacement decls:
+#iplast: decls.get ('iplast', int(os.path.basename(os.getcwd())))  # last tumbler of IP4 address
+#macaddr: eval "de:ad:be:ef:%02d:%02d" % (iplast / 100, iplast % 100)
+#net:     eval "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast)
+#vncport: eval 59000 + iplast - 5900
+#monport: eval 23000 + iplast
+#mon:     eval "-monitor telnet:127.0.0.1:%s,server,nowait,nodelay" % monport
+#vnc:     eval "-vnc :%s" % vncport
+#rdpport = decls.get ('rdpport', 39000 + iplast)
+
+git_repo: git@github.com:jowolf/jjw-salt-master.git
+#git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
+git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
+
+#Todo:
+#salted: False
+#commands: []  # list or run-cmds for cloud-init - $cmd1 $cmd2 ...
+
+files:
+  # same as git_repo_key, above:
+  #
+  #- /home/joe/.ssh/jjw-salt-deploy.id_rsa
+  #- /home/joe/eracks11/conf/docker-compose.yml
+  #- .ssh/id_rsa_jjw
+  #- .ssh/id_rsa_eracks
+---
+section: start.sh
+action:
+  command:
+    start:
+        help: Start the VM
+content: |
+  # start.sh generated $date by eVirt
+
+  tapif=tap-$iplast
+  user=`whoami`
+  echo TAP INTERFACE $tapif USER $user
+
+  sudo ip tuntap add $1 mode tap user $user
+  sudo ip link set $tapif up
+  sleep 0.2s
+  sudo ip link set $tapif master br0
+
+  log=$vmname.log
+  kvm -daemonize -d unimp,guest_errors -D $log $parms -m $ram $vnc $mon $net $drives
+---
+section: stop.sh
+action:
+  command:
+    stop:
+        help: Stop the VM
+content: |
+  # stop.sh generated $date by eVirt
+  #echo Stopping $mname daemon...
+  #daemon --stop --verbose -n $mname -P /vm/
+
+  # nope, cut doesnt deal with eading spaces well - it moves the index
+  # kill -HUP $(ps ax |grep $vmname |grep -v grep | cut -f 1 -d ' ')
+
+  # so use awk
+  sudo kill -HUP $(ps ax |grep $vmname |grep -v grep | awk '{ print $1; }' )
+
+  echo sudo brctl delif br0 tap-$ip
+  sudo brctl delif br0 tap-$ip
+  echo sudo ifconfig tap-$ip down
+  sudo ifconfig tap-$ip down
+  echo sudo tunctl -d tap-$ip
+  sudo tunctl -d tap-$ip
+
+  #echo Replacing pingable IP br0:$ip...
+  #sudo ifconfig br0:$ip 216.218.243.$ip netmask 255.255.255.255
+
+  echo Done with $0 $mname
+---
+section: status.sh
+action:
+  command:
+    status:
+        help: Show the status of the VM
+content: |
+  # status.sh generated $date by eVirt
+  echo $vmname log:
+  echo
+  tail $vmname.log
+  echo
+  echo eVirt log:
+  echo
+  tail evirt.log
+  echo
+  echo sudo ps -axw | grep $vmname |grep -v grep
+  sudo ps -axw | grep $vmname |grep -v grep
+---
+section: mount.sh
+action:
+  command:
+    mount:
+        help: Mount a guest file system to access the VM
+content: |
+  # mount.sh generated $date by eVirt
+  echo Mounting guest FS for $vmname
+  mkdir -p .mount
+  guestmount -a $vmname.$ext -i --rw .mount
+---
+section: unmount.sh
+action:
+  command:
+    unmount:
+        help: Unmount a previously mounted guest file system
+content: |
+  # unmount.sh generated $date by eVirt
+  echo Unmounting guest FS for $vmname
+  umount .mount
+  rmdir .mount

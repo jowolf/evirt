@@ -1,0 +1,5 @@
+9/4/18
+mattermost with email
+new nextcloud with cron and arlo
+
+kubernetes?

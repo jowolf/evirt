@@ -1,0 +1,205 @@
+
+Welcome to Ubuntu 16.04.2 LTS (GNU/Linux 4.4.0-128-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+139 packages can be updated.
+0 updates are security updates.
+
+
+Last login: Tue Jun 26 19:39:11 2018 from 47.143.95.125
+
+        "Labels": null,
+        "Scope": "local"
+    }
+]
+joe@jw:~$ sudo docker volume inspect d2cd008687699d5a1996477ceff0be31dff5009058b6a54a07bb14eee59a2c0e
+[
+    {
+        "Name": "d2cd008687699d5a1996477ceff0be31dff5009058b6a54a07bb14eee59a2c0e",
+        "Driver": "local",
+        "Mountpoint": "/var/lib/docker/volumes/d2cd008687699d5a1996477ceff0be31dff5009058b6a54a07bb14eee59a2c0e/_data",
+        "Labels": null,
+        "Scope": "local"
+    }
+]
+joe@jw:~$ sudo docker volume inspect ec40dd9d60543754cbe99f3368e8f33dd1300d91278826087c6a314431dc6516
+[
+    {
+        "Name": "ec40dd9d60543754cbe99f3368e8f33dd1300d91278826087c6a314431dc6516",
+        "Driver": "local",
+        "Mountpoint": "/var/lib/docker/volumes/ec40dd9d60543754cbe99f3368e8f33dd1300d91278826087c6a314431dc6516/_data",
+        "Labels": null,
+        "Scope": "local"
+    }
+]
+joe@jw:~$ sudo docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+joe@jw:~$ sudo docker ps -a
+CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS                     PORTS                                      NAMES
+20217ddb0f8d        nextcloud-certrenew       "manage_script.py run"   11 months ago       Exited (0) 3 months ago    0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp   nextcloud-app
+2d4223401e1f        nextcloud-certrenew       "/bin/bash"              11 months ago       Exited (0) 3 months ago                                               clever_cray
+982367c73844        filcuc/nextcloud:latest   "/bin/bash"              15 months ago       Exited (0) 11 months ago                                              nextcloud-app-certrenew
+eb4f856b52a7        nextcloud-client-build    "/bin/bash -i make-in"   18 months ago       Exited (0) 18 months ago                                              nostalgic_keller
+c737bc1f087f        c0af3629aea6              "/bin/bash -i make in"   18 months ago       Exited (0) 18 months ago                                              cranky_heisenberg
+b8b95d11b987        filcuc/nextcloud:latest   "manage_script.py /bi"   18 months ago       Created                                                               nextcloud-data
+joe@jw:~$ sudo docker image
+docker: 'image' is not a docker command.
+See 'docker --help'.
+joe@jw:~$ sudo docker images
+REPOSITORY               TAG                 IMAGE ID            CREATED             SIZE
+nextcloud-certrenew      latest              a9c7779d7375        15 months ago       673.2 MB
+nextcloud-client-build   latest              08fee0159562        18 months ago       1.315 GB
+<none>                   <none>              c0af3629aea6        18 months ago       1.315 GB
+<none>                   <none>              3db15bf1a60d        18 months ago       1.315 GB
+<none>                   <none>              4b86725ca99d        18 months ago       1.324 GB
+<none>                   <none>              3049867eb528        18 months ago       1.287 GB
+<none>                   <none>              a3865a6b7dc3        18 months ago       995.8 MB
+<none>                   <none>              1d804c577a11        18 months ago       995.8 MB
+<none>                   <none>              4c0479f775ad        18 months ago       995.8 MB
+ubuntu                   xenial              4ca3a192ff2a        19 months ago       128.2 MB
+filcuc/nextcloud         latest              86c40f6b1e51        22 months ago       385.8 MB
+joe@jw:~$
+ u  16.04 0:-*                                                          139! 16m 0.00 2.4GHz 2.0G5% 2018-06-26 19:49:48
+
+joe@jw:~$ history
+    1  tail -f /var/log/cloud-init-output.log
+    2  less /var/log/cloud-init-output.log
+    3  tail -f /var/log/cloud-init-output.log
+    4  pwd
+    5  tail -f /var/log/cloud-init-output.log
+    6  less /var/log/cloud-init-output.log
+    7  cat cloud-init-runcmd.sh
+    8  git clone -q git@github.com:jowolf/tlg.git
+    9  git clone -q https://github.com/jowolf/tlg.git
+   10  docker create --name nextcloud-data filcuc/nextcloud:latest /bin/true
+   11  docker run -ti --rm --volumes-from nextcloud-data --name nextcloud-app -p 80:80 -p 443:443 filcuc/nextcloud:lates
+t setup --nc-db='pgsql' --nc-db-user='nextcloud' --nc-db-pass='nextcloud' --nc-db-name='nextcloud' --nc-url='https://dow
+nload.nextcloud.com/server/releases/nextcloud-9.0.53.tar.bz2' --nc-archive='nextcloud-9.0.53.tar.bz2' --nc-admin-name='a
+dmin' --nc-admin-pass='admin' --nc-dir-name='nextcloud' --ng-root='/var/www/' --ng-user='www-data' --ng-domain='jw.vc' -
+-le-email='j@jw.vc'
+   12  docker run -ti --rm --volumes-from nextcloud-data --name nextcloud-app -p 80:80 -p 443:443 filcuc/nextcloud:lates
+t run
+   13  mc
+   14  sudo mc                                                                                                 [241/308]
+   15  sudo mc
+   16  docker
+   17  docker ps -a
+   18  docker ps -a
+   19  docker port
+   20  docker port 1b779e13b544
+   21  docker port 1b779e13b544
+   22  sudo mc
+   23  docker run -ti --rm --volumes-from nextcloud-data --name nextcloud-app -p 80:80 -p 443:443 filcuc/nextcloud:lates
+t run
+   24  sudo su
+   25  sudo mc
+   26  df -h
+   27  mount
+   28  sudo apt-get update
+   29  sudo apt-get upgrade
+   30  sudo reboot
+   31  sudo apt-get update
+   32  sudo apt-get upgrade
+   33  sudo apt-get autoremove --purge
+   34  sudo apt-get dist-upgrade
+   35  sudo apt-get autoremove --purge
+   36  sudo reboot
+   37  sudo mc
+   38  pwd
+   39  ls -l
+   40  ls -la
+   41  ls -la .local/
+   42  ls -la .local/share/
+   43  ls -la .local/share/mc/
+   44  ls -la .config/mc/
+   45  sudo mc
+   46  history
+   47  docker run -ti --volumes-from nextcloud-data --name nextcloud-app filcuc/nextcloud:latest /bin/bash
+   48  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew filcuc/nextcloud:latest /bin/bash
+   49  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew filcuc/nextcloud:latest --entrypoint
+/bin/bash
+   50  docker ps
+   51  docker ps -a
+   52  docker rm 4c495ac275b6
+   53  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew filcuc/nextcloud:latest --entrypoint
+/bin/bash
+   54  docker ps -a
+   55  docker rm b345d74b8e21 3e8a3b6e0805 fbc3b789351f cc2e89cf0d50 c49d0f7feabc ebf0d4c9585b 1911ed52ab4f
+   56  docker ps -a
+   57  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew filcuc/nextcloud:latest --entrypoint
+/bin/bash /bin/bash
+   58  docker rm b99fefaa0588 c31032e25965 2bef5f36364c 945c928f7060 5fef6d6b4778 4db4532ead09 e5d15edff022 fdbba4d87324
+ 01266c019426 46842a6bba65 3e8af6ae9711 1d5efc18fd09 abe1ed6db051 c69e9afd51b3
+   59  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew filcuc/nextcloud:latest --entrypoint
+/bin/bash /bin/bash
+   60  docker ps -a
+   61  docker rm c8e2ada1c198 217f8c8e6922 dffde4026501 cb69dae50cfd
+   62  docker ps -a
+   63  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew --entrypoint /bin/bash filcuc/nextclo
+ud:latest
+   64  docker ps
+   65  docker ps -a
+   66  docker images                                                                                           [182/308]
+   67  docker
+   68  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew --entrypoint /bin/bash 982367c73844
+   69  docker start 982367c73844
+   70  docker attach 982367c73844
+   71  docker ps -a
+   72  docker
+   73  docker help commit
+   74  docker commit --help
+   75  docker commit 982367c73844 nextcloud-certrenew
+   76  ps -a
+   77  docker ps -a
+   78  docker images
+   79  docker images
+   80  docker ps -a
+   81  docker ps
+   82  history
+   83  docker attach 982367c73844
+   84  docker attach nextcloud-certrenew
+   85  docker attach 9929390a2ea3
+   86  pwd
+   87  ls -l
+   88  docker images
+   89  docker ps -a
+   90  docker ps
+   91  docker images -a
+   92  docker start 982367c73844
+   93  docker ps
+   94  docker attach 982367c73844
+   95  docker ps AAA
+   96  docker info
+   97  docker info nextcloud-data
+   98  docker
+   99  docker inspect nextcloud-data
+  100  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew --entrypoint /bin/bash 982367c73844
+  101  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew --entrypoint /bin/bash
+  102  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew --entrypoint /bin/bash nextcloud-app$
+certrenew
+  103  docker images
+  104  docker run -ti --volumes-from nextcloud-data --name nextcloud-app-certrenew --entrypoint /bin/bash nextcloud-cer$
+renew
+  105  docker run -ti --volumes-from nextcloud-data --entrypoint /bin/bash nextcloud-certrenew
+  106  ifconfig
+  107  ifconfig |less
+  108  ifconfig |less
+  109  mc
+  110  sudo cp x /etc/network/interfaces.d/50-cloud-init.cfg
+  111  ifconfig
+  112  ifconfig
+  113  cat /etc/network/interfaces.d/50-cloud-init.cfg
+  114  sudo cp x /etc/network/interfaces.d/50-cloud-init.cfg
+  115  cat /etc/network/interfaces.d/50-cloud-init.cfg
+  116  sync
+  117  cat x
+  118  cat x >> /etc/network/interfaces
+  119  ifconfig
+  120  netstat -antp
+  121  history
