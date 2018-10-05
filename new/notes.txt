@@ -1,10 +1,58 @@
+10/4 OK afew avenues possible:
+1) enh files: section
+- add dict parms to files - copy, user, parms
+- later, add share, etc
+
+2) chg to use actions: section
+- copy, share, git, github, gitlab, firstboot, everyboot
+- clean systax
+- harder to implement, need to tie scripties and files together
+
+3) use shared host dirs - copy, startup.d or firstboot
+- slick, elegant, easier to implement
+- security issues - too easy to root 
+- could explicitly require commands to be named, reducing benefit too
+
+4) add commands: or spinup: section
+- easy to implement as loop
+- still requires files to match
+- good balance though
+
+10/2 tue
+OK: canonical startup modules:
+- cd user at start and chown user at end
+- eg set up docker compaose
+- could use exisitng starup list
+- could have rootstartup and userstarup
+- salt could be one of these modules
+- github could too
+
+
+10/1 todo:
+Note: iplast and ipbase assume 24-bit netmask - Warning!
+
+Exc idea: evm status should nmap the vm
+
+
+9/30 test edit from gedit via ssh connection
+a 10/1 seems to work OK, better than Atom
+
+todo:
+- way to add packages -
+  packages: in decls should add to default-packages
+- separte out salt, and/or
+- use startup1-<whatever> thru startup-n (n=5, can add)
+
 9/29 Todo:
 
+regen pws - benign, nink, chme, put in template
+Regen B's 1804 & 1604 VMs
+
+- drone.io CI/CD - letsencrypt?
 - Mattermost SSL
-- drone.io CI/CD
 - eRacks11
-- Nextcloud
-- Wordpress
+- Nextcloud letsencrypt
+- Wordpress SSL / letsencrypt
 
 9/29 For now, only one decl section -
 

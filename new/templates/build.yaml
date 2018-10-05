@@ -46,19 +46,19 @@ content: |
         #!/bin/bash
 
         for f in /sys/bus/virtio/drivers/9pnet_virtio/virtio*; do
-          echo VALID MOUNT TAGS >> 6_MOUNTING_HOSTSHARES
-          echo $f >> 6_MOUNTING_HOSTSHARES
+          echo VALID MOUNT TAGS >> 5_MOUNTING_HOSTSHARES
+          echo $f >> 5_MOUNTING_HOSTSHARES
           mtag=`cat $f/mount_tag`
-          echo $mtag >> 6_MOUNTING_HOSTSHARES
+          echo $mtag >> 5_MOUNTING_HOSTSHARES
         done
 
         n=0
         for p in $hostshares; do    # for f in a b c d e; do
-          echo MAPPING $n $p >> 6_MOUNTING_HOSTSHARES
+          echo MAPPING $n $p >> 5_MOUNTING_HOSTSHARES
           mkdir -p /home/$user/$p
-          echo mount -t 9p -o trans=virtio,version=9p2000.L,uname=joe hostshare$n /home/$user/$p >> 6_MOUNTING_HOSTSHARES
-          mount -t 9p -o trans=virtio,version=9p2000.L,uname=joe hostshare$n /home/$user/$p >> 6_MOUNTING_HOSTSHARES
-          mount >> 6_MOUNTING_HOSTSHARES
+          echo mount -t 9p -o trans=virtio,version=9p2000.L,uname=$user hostshare$n /home/$user/$p >> 5_MOUNTING_HOSTSHARES
+          mount -t 9p -o trans=virtio,version=9p2000.L,uname=$user hostshare$n /home/$user/$p >> 5_MOUNTING_HOSTSHARES
+          mount >> 5_MOUNTING_HOSTSHARES
           (( ++n ))
         done
     - path: /home/$user/go.sh
@@ -73,67 +73,77 @@ content: |
     - path: /root/cloud-init-runcmd.sh
       permissions: '0770'
       content: |
+        #for cmd in $spinup_commands; do loop thru with cd and chown at front & back
         cd /home/$user
 
-        echo 1_DOING_KEYSCAN
-        touch 1_DOING_KEYSCAN
-        sudo -u $user ssh-keyscan -H github.com >>/home/$user/.ssh/known_hosts
-        echo DONE >> 1_DOING_KEYSCAN
-
-        echo 2_PRECONFIG_BASH_HISTORY
-        touch 2_PRECONFIG_BASH_HISTORY
+        echo 0_PRECONFIG_BASH_HISTORY
+        touch 0_PRECONFIG_BASH_HISTORY
         echo tail -f /var/log/cloud-init-output.log >> /home/$user/.bash_history
         echo less /var/log/cloud-init-output.log >> /home/$user/.bash_history
         echo less /var/log/cloud-init.log >> /home/$user/.bash_history
         echo sudo netstat -antp >> /home/$user/.bash_history
-        echo DONE >> 2_PRECONFIG_BASH_HISTORY
+        echo DONE >> 0_PRECONFIG_BASH_HISTORY
 
-        # now used only for salt
-        echo 3_CLONE_GIT_REPO
-        touch 3_CLONE_GIT_REPO
-        #ssh-agent bash -c 'ssh-add $git_repo_key && git clone -q $git_repo' >> 3_CLONE_GIT_REPO
+
+        # salt-master - move to startup-n-saltmaster.sh
+
+        echo 1_DOING_GITHUB_KEYSCAN
+        touch 1_DOING_GITHUB_KEYSCAN
+        sudo -u $user ssh-keyscan -H github.com >>/home/$user/.ssh/known_hosts
+        echo DONE >> 1_DOING_GITHUB_KEYSCAN
+
+        echo 2_CLONE_GIT_REPO
+        touch 2_CLONE_GIT_REPO
+        #ssh-agent bash -c 'ssh-add $git_repo_key && git clone -q $git_repo' >> 2_CLONE_GIT_REPO
         # do them separately so we can do pub repos w/o key
-        ssh-agent bash -c 'ssh-add $git_repo_key >> 3_CLONE_GIT_REPO 2>&1'
-        ssh-agent bash -c 'git clone -q $git_repo >> 3_CLONE_GIT_REPO 2>&1'
-        echo DONE >> 3_CLONE_GIT_REPO
+        cd /home/$user
+        echo chmod 600 $git_repo_key
+        chmod 600 $git_repo_key
+        echo chown $user:$user $git_repo_key
+        chown $user:$user $git_repo_key
+        sudo chown -R $user:$user /home/$user >> 2_CLONE_GIT_REPO 2>&1
+        #echo sudo -u $user ssh-agent bash -c \'ssh-add $git_repo_key && git clone -q $git_repo\' >> 2_CLONE_GIT_REPO 2>&1
+        #sudo -u $user ssh-agent bash -c \'ssh-add $git_repo_key && git clone -q $git_repo\' >> 2_CLONE_GIT_REPO 2>&1
+        #ssh-agent bash -c 'git clone -q $git_repo >> 2_CLONE_GIT_REPO 2>&1'
+        sudo -u joe ssh-agent bash >> 2_CLONE_GIT_REPO 2>&1 <<EOF
+        ssh-add /home/joe/.ssh/id_rsa_jjw-salt-deploy
+        git clone -q git@github.com:jowolf/jjw-salt-master.git
+        EOF
+        echo DONE >> 2_CLONE_GIT_REPO
 
-        echo 4_SETTING_UP_DOCKER_COMPOSE
-        touch 4_SETTING_UP_DOCKER_COMPOSE
+
+        # move to startup-n-docker-compose-setup.sh
+
+        echo 3_SETTING_UP_DOCKER_COMPOSE
+        touch 3_SETTING_UP_DOCKER_COMPOSE
         # sudo apt-get install python-virtualenv
         virtualenv -v env
         #./go.sh
         . env/bin/activate
-        pip install docker-compose >> 4_SETTING_UP_DOCKER_COMPOSE 2>&1
-        echo DONE >> 4_SETTING_UP_DOCKER_COMPOSE
+        pip install docker-compose >> 3_SETTING_UP_DOCKER_COMPOSE 2>&1
+        echo DONE >> 3_SETTING_UP_DOCKER_COMPOSE
 
-        echo 5_CHOWN_$user
-        touch 5_CHOWN_$user
+
+        echo 4_CHOWN_$user
+        touch 4_CHOWN_$user
         sudo chown -R $user:$user /home/$user
-        echo DONE >> 5_CHOWN_$user
+        echo DONE >> 4_CHOWN_$user
 
-        echo 6_MOUNTING_HOSTSHARES
+        echo 5_MOUNTING_HOSTSHARES
 
         hostmounts.sh
 
-        #for f in /sys/bus/virtio/drivers/9pnet_virtio/virtio*; do
-        #  echo VALID MOUNT TAGS >> 6_MOUNTING_HOSTSHARES
-        #  echo $f >> 6_MOUNTING_HOSTSHARES
-        #  mtag=`cat $f/mount_tag`
-        #  echo $mtag >> 6_MOUNTING_HOSTSHARES
-        #done
+        echo DONE >> 5_MOUNTING_HOSTSHARES
 
-        #n=0
-        #for p in $hostshares; do    # for f in a b c d e; do
-        #  echo MAPPING $n $p >> 6_MOUNTING_HOSTSHARES
-        #  mkdir -p /home/$user/$p
-        #  echo mount -t 9p -o trans=virtio,version=9p2000.L,uname=joe hostshare$n /home/$user/$p >> 6_MOUNTING_HOSTSHARES
-        #  mount -t 9p -o trans=virtio,version=9p2000.L,uname=joe hostshare$n /home/$user/$p >> 6_MOUNTING_HOSTSHARES
-        #  mount >> 6_MOUNTING_HOSTSHARES
-        #  (( ++n ))
-        #done
 
-        echo DONE >> 6_MOUNTING_HOSTSHARES
+        # fill bash var w/fname of startup-<n>-<whaever>.sh
 
+        if test -e startup-1-*.sh; then
+          st=`ls startup-1-*`
+          echo 6_DOING-$st-COMMANDS
+          sudo -u $user sh -c "sh $st >> 6_DOING-$st-COMMANDS 2>&1"
+          echo DONE >> 6_DOING-$st-COMMANDS
+        fi
 
         if test -e startup.sh; then
           echo 7_DOING_STARTUP_COMMANDS
@@ -163,27 +173,6 @@ content: |
     - bash cloud-init-runcmd.sh >>RUNNING_RUNCMD_SCRIPT
     - echo DONE >>RUNNING_RUNCMD_SCRIPT
 ---
-#section: metadata.yaml
-#action:
-#  save: $workdir
-#content: |
-#  #dsmode: local
-#  instance-id: $vmname;
-#  network-interfaces: |
-#    auto ens3
-#    #iface ens3 inet dhcp
-#    iface ens3 inet static
-#      # for local VMs, at least on LGram, this is the lxc bridge nw
-#      address 10.0.3.$iplast
-#    #  address 216.172.133.$iplast
-#    #  #network 216.172.133.0
-#      netmask 255.255.255.0
-#    #  #broadcast 216.172.133.255
-#    #  gateway 216.172.133.1
-#      gateway 10.0.3.1
-#      dns-nameservers 72.13.81.2 72.13.91.2 1.1.1.1 8.8.8.8 4.2.2.1 4.2.2.2 4.2.2.3
-#  local-hostname: $vmname
-#---
 section: download.sh
 action:
   command:
@@ -202,12 +191,6 @@ content: |
   fname=`basename $image`
 
   echo IMAGE FILENAME $fname
-
-  # Check for remote / downloadable:
-  #if test ${image:0:4} != http; then {
-  #  echo Image $image is local - not downloading
-  #  exit
-  #} fi
 
   # download image as basename
   if ( ls $fname || ls $installdir/$fname ); then
