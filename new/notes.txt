@@ -1,3 +1,118 @@
+
+10/4 OK afew avenues possible:
+1) enh files: section
+- add dict parms to files - copy, user, parms
+- later, add share, etc
+
+2) chg to use actions: section
+- copy, share, git, github, gitlab, firstboot, everyboot
+- clean systax
+- harder to implement, need to tie scripties and files together
+
+3) use shared host dirs - copy, startup.d or firstboot
+- slick, elegant, easier to implement
+- security issues - too easy to root 
+- could explicitly require commands to be named, reducing benefit too
+
+4) add commands: or spinup: section
+- easy to implement as loop
+- still requires files to match
+- good balance though
+
+10/2 tue
+OK: canonical startup modules:
+- cd user at start and chown user at end
+- eg set up docker compaose
+- could use exisitng starup list
+- could have rootstartup and userstarup
+- salt could be one of these modules
+- github could too
+
+
+10/1 todo:
+Note: iplast and ipbase assume 24-bit netmask - Warning!
+
+Exc idea: evm status should nmap the vm
+
+
+9/30 test edit from gedit via ssh connection
+a 10/1 seems to work OK, better than Atom
+
+todo:
+- way to add packages -
+  packages: in decls should add to default-packages
+- separte out salt, and/or
+- use startup1-<whatever> thru startup-n (n=5, can add)
+
+9/29 Todo:
+
+regen pws - benign, nink, chme, put in template
+Regen B's 1804 & 1604 VMs
+
+- drone.io CI/CD - letsencrypt?
+- Mattermost SSL
+- eRacks11
+- Nextcloud letsencrypt
+- Wordpress SSL / letsencrypt
+
+9/29 For now, only one decl section -
+
+future: will need to separate out reading the Yaml from the actions -
+iow, sep load from _process, similar w/command and _do
+
+9/28
+subtle bug:  .evirt/start.sh is correct, but evm start doubles the parms -
+
+it's because of having 2 decls sections, as referenced in the 'parents'.
+
+- implementing the auto-run-setup based on md5 of create-dates might solve this -
+either run what's there, or rebuild, or both (but sequentially).
+
+
+9/23 todo:
+allow default / evirt files & hostdirs to be added to in ev.py
+test on 18.04 host (bioic) w/security=none (not passthru)
+
+rc.local, hostmounts.sh working -
+- need #!/bin/bash
+- chmod +x
+
+Don't forget:
+- may not always need reboot
+- will need to manually change hostmounts script if any changes in hostdirs
+
+
+9/22 struggling with hostshare<n> :
+- Available mount tags can be seen by reading /sys/bus/virtio/drivers/9pnet_virtio/virtio<n>/mount_tag files.
+
+https://www.kernel.org/doc/Documentation/filesystems/9p.txt
+
+ideas:
+- log vm spinup progress to shared folder
+- look for and test the above
+- mkdir vm local folders in hostdir list
+
+for f in /sys/bus/virtio/drivers/9pnet_virtio/virtio*; do
+  echo $f
+  cat $f/mount_tag
+  mtag=$f/mount_tag
+  mkdir /$mtag
+  chown $user:$user /$mtag
+  mount -t 9p $mtag /
+  echo
+
+
+  no - remember we need to reunite the declared hostdirs -
+
+  for i in len(lostdirs):
+    vfy mtag(i)
+    d = hostdirs [i]
+    mkdir $d
+    chown u:u $d
+    mount mtag d
+done
+
+
 9/21 hostdir shared folders (and other things) are flawed - 
 there's no DRY, unified, encapsulated view - 
 You still have to put sh*t in 2 diverse places that has to match - 
@@ -13,6 +128,7 @@ Worse: eg: mattermost volumes are in 3 places -
 
 sigh.
 [SOLVED]
+
 
 9/19
 Firefox snap build
@@ -87,6 +203,21 @@ d Warning: file not found, not including (for ssh keys, docker-compose.yaml, etc
 
 Need to NOT write anything unless the command says to - help, <default / show>, err, etc
 so need more clg research
+
+
+9/1/18 epiphany - allow nestable inherit: command, check <install>/templates dir
+- Windows7-remote-desktop
+- ubuntu1604
+- ubuntu1804
+- mattermost
+- wordpress
+- cron
+
+
+7/28 Todo:
+Implem newvm command - mkdir + pre-pop w/example script
+eg:
+evm newvm serog-1804 [ubuntu 18.04 britta]
 
 
 7/21/18 Todo:

@@ -1,0 +1,16 @@
+section: metadata.yaml
+action:
+  save: $workdir
+content: |
+  instance-id: $vmname;
+  network-interfaces: |
+    auto ens3
+    #iface ens3 inet dhcp
+    iface ens3 inet static
+      address $ipbase.$iplast
+      netmask 255.255.255.0
+      #network 216.172.133.0
+      #broadcast 216.172.133.255
+      gateway $ipbase.1
+      dns-nameservers 72.13.81.2 72.13.91.2 1.1.1.1 8.8.8.8 4.2.2.1 4.2.2.2 4.2.2.3
+  local-hostname: $vmname

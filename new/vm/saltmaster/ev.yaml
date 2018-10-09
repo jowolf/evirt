@@ -5,10 +5,11 @@ action:
 image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
 
 #vmname: default is to use basename of curdir
-iplast: 51  # 0 implies local / rdesktop access - empty / undeclared implies 0
+iplast: 3  # 0 implies local / rdesktop access - empty / undeclared implies 0
+ipbase: 216.172.134
 
 # Works, tested:
-net: "-net tap,name=eth0,ifname=$tapif,script=no,downscript=no -net nic,model=virtio"
+#net: "-net tap,name=eth0,ifname=$tapif,script=no,downscript=no -net nic,model=virtio"
 
 user: joe
 #passwd: '$6$rounds=4096$9HeOrRyXEKcTYA5h$mjWahfdV6X.lIiyDwRc/6hXv.7UJCH55XZbHgOOTG3yRh/3vOg5iEukKwYV8kURYtE.GuE/SGI0sUCSAqAgkS.'
@@ -24,9 +25,15 @@ ram: 2G
 #  - test
 
 files:
-  - startup.sh
-  - docker-compose.yml
+  #- startup.sh
+  #- docker-compose.yml
   - /home/$user/.config/mc/ini
+  - /home/joe/.ssh/id_rsa_jjw-salt-deploy
+  #- /home/joe/.ssh/jjw-salt-deploy.id_rsa
+  #- /home/joe/.ssh/id_rsa_eracks-deploy
+
+git_repo: git@github.com:jowolf/jjw-salt-master.git
+git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
 
 ---
 section: parents
