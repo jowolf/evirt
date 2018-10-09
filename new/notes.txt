@@ -1,3 +1,19 @@
+9/21 hostdir shared folders (and other things) are flawed - 
+there's no DRY, unified, encapsulated view - 
+You still have to put sh*t in 2 diverse places that has to match - 
+ie, hostshare0-4 with the mount statement, presumably 
+  inside the guest in a script or append to /etc/fstab
+
+yuk.
+
+Worse: eg: mattermost volumes are in 3 places - 
+- mkdir in host
+- mount and mkdir (subfolders) in new vm
+- volume mount in docker instances
+
+sigh.
+[SOLVED]
+
 9/19
 Firefox snap build
 
