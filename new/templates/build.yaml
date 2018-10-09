@@ -73,68 +73,23 @@ content: |
     - path: /root/cloud-init-runcmd.sh
       permissions: '0770'
       content: |
-        #for cmd in $spinup_commands; do loop thru with cd and chown at front & back
-        cd /home/$user
+        for cmd in $spinup_command_names; do {
+          #loop thru with cd and chown at front & back
+          cd /home/$user
+          sudo chown -R $user:$user /home/$user
 
-        echo 0_PRECONFIG_BASH_HISTORY
-        touch 0_PRECONFIG_BASH_HISTORY
-        echo tail -f /var/log/cloud-init-output.log >> /home/$user/.bash_history
-        echo less /var/log/cloud-init-output.log >> /home/$user/.bash_history
-        echo less /var/log/cloud-init.log >> /home/$user/.bash_history
-        echo sudo netstat -antp >> /home/$user/.bash_history
-        echo DONE >> 0_PRECONFIG_BASH_HISTORY
+          echo DOING-$cmd
+          echo START DOING-$cmd >> DOING-$cmd
 
+          sudo --user $user --login bash /home/$user/$cmd >> DOING-$cmd 2>&1
 
-        # salt-master - move to startup-n-saltmaster.sh
-
-        echo 1_DOING_GITHUB_KEYSCAN
-        touch 1_DOING_GITHUB_KEYSCAN
-        sudo -u $user ssh-keyscan -H github.com >>/home/$user/.ssh/known_hosts
-        echo DONE >> 1_DOING_GITHUB_KEYSCAN
-
-        echo 2_CLONE_GIT_REPO
-        touch 2_CLONE_GIT_REPO
-        #ssh-agent bash -c 'ssh-add $git_repo_key && git clone -q $git_repo' >> 2_CLONE_GIT_REPO
-        # do them separately so we can do pub repos w/o key
-        cd /home/$user
-        echo chmod 600 $git_repo_key
-        chmod 600 $git_repo_key
-        echo chown $user:$user $git_repo_key
-        chown $user:$user $git_repo_key
-        sudo chown -R $user:$user /home/$user >> 2_CLONE_GIT_REPO 2>&1
-        #echo sudo -u $user ssh-agent bash -c \'ssh-add $git_repo_key && git clone -q $git_repo\' >> 2_CLONE_GIT_REPO 2>&1
-        #sudo -u $user ssh-agent bash -c \'ssh-add $git_repo_key && git clone -q $git_repo\' >> 2_CLONE_GIT_REPO 2>&1
-        #ssh-agent bash -c 'git clone -q $git_repo >> 2_CLONE_GIT_REPO 2>&1'
-        sudo -u joe ssh-agent bash >> 2_CLONE_GIT_REPO 2>&1 <<EOF
-        ssh-add /home/joe/.ssh/id_rsa_jjw-salt-deploy
-        git clone -q git@github.com:jowolf/jjw-salt-master.git
-        EOF
-        echo DONE >> 2_CLONE_GIT_REPO
-
-
-        # move to startup-n-docker-compose-setup.sh
-
-        echo 3_SETTING_UP_DOCKER_COMPOSE
-        touch 3_SETTING_UP_DOCKER_COMPOSE
-        # sudo apt-get install python-virtualenv
-        virtualenv -v env
-        #./go.sh
-        . env/bin/activate
-        pip install docker-compose >> 3_SETTING_UP_DOCKER_COMPOSE 2>&1
-        echo DONE >> 3_SETTING_UP_DOCKER_COMPOSE
-
-
-        echo 4_CHOWN_$user
-        touch 4_CHOWN_$user
-        sudo chown -R $user:$user /home/$user
-        echo DONE >> 4_CHOWN_$user
+          sudo chown -R $user:$user /home/$user
+          echo DONE >> DOING-$cmd
+        } done
 
         echo 5_MOUNTING_HOSTSHARES
-
         hostmounts.sh
-
         echo DONE >> 5_MOUNTING_HOSTSHARES
-
 
         # fill bash var w/fname of startup-<n>-<whaever>.sh
 

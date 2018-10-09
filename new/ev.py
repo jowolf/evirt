@@ -133,6 +133,16 @@ class Section (object):
             print ("Warning - path not found: %s - creating" % path)
             os.makedirs (path)
 
+        # configure spinup commands
+
+        spinup = decls.get ('spinup', [])
+        for n,path in enumerate (spinup):
+          path = Template (path).safe_substitute (decls)
+          if not os.access (path, os.R_OK):
+            print ("Warning - spinup script not found: %s" % path)
+          else:
+            spinup [n] = path
+
         # update locals back to decls dict
 
         ud = dict (
@@ -159,6 +169,7 @@ class Section (object):
             rdpport = rdpport,
             parms   = parms,
             hostshares = ' '.join (hostdirs),
+            spinup_command_names = ' '.join (spinup),
             #date    = datetime.date.today().isoformat(),
             date    = datetime.datetime.today().ctime(),
 
@@ -195,7 +206,7 @@ class Section (object):
               decls ['file%d' % (n+1)] =   \
                 ("- path: %s\n" % (f if f.startswith('/') else os.path.join ('/home', user, f)))  + \
                  "    content: |\n"     + \
-                 ''.join ([('      ' + lin) for lin in open(f)])
+                 ''.join ([('      ' + Template (lin).safe_substitute (decls)) for lin in open(f)])
                 # owner nfg: cloud-init can't find joe
                 # ("    owner: %s\n" % user) + \
                 # "    permissions: '0770'\n" + \

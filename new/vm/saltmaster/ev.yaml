@@ -24,7 +24,11 @@ ram: 2G
 #  - spinup
 #  - test
 
+spinup:
+  - github-saltmaster.sh 
+
 files:
+  - github-saltmaster.sh 
   #- startup.sh
   #- docker-compose.yml
   - /home/$user/.config/mc/ini
@@ -32,7 +36,7 @@ files:
   #- /home/joe/.ssh/jjw-salt-deploy.id_rsa
   #- /home/joe/.ssh/id_rsa_eracks-deploy
 
-git_repo: git@github.com:jowolf/jjw-salt-master.git
+#git_repo: git@github.com:jowolf/jjw-salt-master.git
 git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
 
 ---
