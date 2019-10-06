@@ -5,7 +5,7 @@ action:
 image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
 
 #vmname: default is to use basename of curdir
-iplast: 51  # 0 implies local / rdesktop access - empty / undeclared implies 0
+iplast: 53  # 0 implies local / rdesktop access - empty / undeclared implies 0
 
 # Works, tested:
 net: "-net tap,name=eth0,ifname=$tapif,script=no,downscript=no -net nic,model=virtio"

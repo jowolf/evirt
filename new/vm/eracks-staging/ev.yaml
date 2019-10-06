@@ -12,23 +12,24 @@ key: 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAvYqSpJvAKMqxSa9Mzhdw7pFk/UOzEOith8Uolv
 size: 20G
 ram: 2G
 
+# Nope - nfg, 'too many levels of symlinks' - so clone it inside the vm
+#hostdirs:
+#  - eracks11
+
+goto: cd eracks11/conf\ndocker-compose ps\n
+
+spinup:
+  - preconfig-bash-history.sh
+  - salt-minion.sh
+  - eracks12-staging-spinup.sh
+
 files:
-  - startup.sh
-  - docker-compose.yml
-  - /home/joe/.ssh/jjw-salt-deploy.id_rsa
-  - /home/joe/.ssh/eracks-deploy
+  #- /home/joe/.ssh/jjw-salt-deploy.id_rsa
+  - /home/joe/.ssh/id_rsa_eracks-deploy
   - /home/joe/.ssh/id_rsa_gitlab
+  - /home/joe/.ssh/id_rsa_studio
   - /home/$user/.config/mc/ini
   #- $user/.ssh/id_rsa
-  #- .ssh/id_rsa_jjw
-  #- .ssh/id_rsa_eracks
-
-#Todo:
-#salted: False
-
-git_repo: git@github.com:jowolf/jjw-salt-master.git
-#git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
-git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
 
 ---
 section: parents
@@ -36,3 +37,4 @@ action:
   inherit:
     - base.yaml
     - build.yaml
+    - fixedip.yaml

@@ -1,7 +1,7 @@
 section: declarations
 action:
   load: declarations
-iplast: 50
+iplast: 52
 vmname: nextcloud-eracks
 ext: img
 permanent: True
