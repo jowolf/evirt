@@ -1,0 +1,23 @@
+10/22/18 Todo JJW:
+
+1) test studio key injections
+
+2) get minimal github config installed in .ssh/config:
+
+AddKeysToAgent yes
+
+Host github.com
+  Hostname ssh.github.com
+  Port 443
+
+3) add git identities from cmdline:
+
+git config --global user.email "joe@eracks.com"
+git config --global user.name "Joseph Wolff"
+
+
+The easy way to do (2) and (3) is just to put them into the github-saltmaster.sh file
+
+
+4) add ssh-agent or set up keychain (installed, still nfg)
+

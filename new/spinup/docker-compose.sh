@@ -8,4 +8,6 @@ virtualenv -v env
 . env/bin/activate
 pip install docker-compose
 
+# this one requires reboot to take effect
+sudo adduser $user docker
 

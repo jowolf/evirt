@@ -12,8 +12,12 @@ ipbase: 216.172.134
 #net: "-net tap,name=eth0,ifname=$tapif,script=no,downscript=no -net nic,model=virtio"
 
 user: joe
-#passwd: '$6$rounds=4096$9HeOrRyXEKcTYA5h$mjWahfdV6X.lIiyDwRc/6hXv.7UJCH55XZbHgOOTG3yRh/3vOg5iEukKwYV8kURYtE.GuE/SGI0sUCSAqAgkS.'
-passwd: '$6$rounds=4096$q90EnZyI.$3S5FyM8qKRg76dnkIFlPFHHF2zpWIPJaLDCddc5Mg5oeeRTbRDOv/mraN9uEVGI/vfWPVJphHpWlV58QczSBC1'
+# benign
+#passwd: '$6$rounds=4096$q90EnZyI.$3S5FyM8qKRg76dnkIFlPFHHF2zpWIPJaLDCddc5Mg5oeeRTbRDOv/mraN9uEVGI/vfWPVJphHpWlV58QczSBC1'
+# Benink important
+passwd: '$6$rounds=4096$ZP4yDqI6nZkB$OdBQ44PjexA8hWDhuIonEI4rlcfHxXwJA/Aa5dP1..HmO7oB5cEXkUPYkIxOy3PlBmV3BiPgSxZlXYTE/qjj3.'
+# changeme
+#passwd: '$6$rounds=4096$zPpA5Baj$0pMtV2ePq19Q0JJIQ/iZXugw3X1KNnyKI4aaYRHYRXNAA0YURIQwqzGqLhRYShJzhSc/taKNm2pA.Dc/Lwir.1'
 key: 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAvYqSpJvAKMqxSa9Mzhdw7pFk/UOzEOith8UolvC5HpeRieZFwPdXeEDbsVSXlzQqy0v1i226W8+CPX9JX82VWI2RZIkB3sJq3AEELO3pDbDe/Uc1WsTzbN6QUBlpl2OvZB0bBvkGbbATUU2xXefDV/g3ma4k1HkiQIAB6Ymw6XM8+5iznhx8ERsUUE9V9NGc52ujAr4Sz5E+wgLxZXWKW25IiPfAMOHvlEzfiL4S3Q8YruSy337C54ttf8VFwBHcotzybhOIUEqCqsAc70RLlhNpafNLx/sJD/yJ+R3AO0z6Brm8eVeax56gSs4eIdY23tufX2drL8ZnY1LNNhdV9w== joe@STUDIO'
 
 size: 20G
@@ -33,6 +37,8 @@ files:
   #- docker-compose.yml
   - /home/$user/.config/mc/ini
   - /home/joe/.ssh/id_rsa_jjw-salt-deploy
+  - /home/joe/.ssh/id_rsa_studio
+  - /home/joe/.ssh/id_rsa_studio.pub
   #- /home/joe/.ssh/jjw-salt-deploy.id_rsa
   #- /home/joe/.ssh/id_rsa_eracks-deploy
 

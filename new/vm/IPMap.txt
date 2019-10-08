@@ -1,0 +1,77 @@
+JJW upd 6/4/19
+
+133.9 - Cyber Power strip?  Collision?
+
+
+JJW 11/3/18
+
+133:
+
+2 - uec1.librehost.com (hw host)
+
+5 - jw.vc (legacy Nextcloud)
+
+7 - staging.eracks.com
+
+9 - ?
+
+10 - OpenStack16 IPMI (times out)
+
+11 - APC
+
+12 - APC
+
+13 - nothing there, according to nmap
+
+15 - eRacks.com
+
+16 - dev.eracks.com
+
+18 - TP Link smart switch - down or doesn't ping/ssh/http/nmap
+
+32 - uec1 IPMI
+
+(38 - domain is set to apc.libregroup.com, but there's no host there)
+
+40 - serog 18.04
+41 - serog 16.04
+
+50 - mattermost.eracks.com
+
+51 - nextcloud.jw.vc (new, under const)
+
+61 - WordPress (Legacy)
+
+128 - openstack16 (hw)
+
+161 - WordPress (Legacy)
+
+210 - Ryan Russell
+211 (on hold) - Ryan Russell
+
+
+
+134:
+
+2: librehost.com (hw host)
+
+3: desqhost.com, saltmaster
+
+6: Seafile (Last login: Fri Sep  8 11:28:28 2017 from 47.143.90.221)
+
+9: tlg (old - Last login: Thu Oct 13 18:59:13 2016 from 47.143.97.181 - "Welcome to nginx!")
+
+15: eRacks dup - configured to respond to both 133 and 134 for transition/legacy reasons
+
+21: mail4.eracks.com
+
+44: Old Zimbra (~5?)
+
+126: ns1 (hw - ns1.librehost.net?)
+
+
+
+
+Old:
+
+200 - John Wegis

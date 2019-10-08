@@ -1,0 +1,1 @@
+/home/joe/evirt/new/spinup/preconfig-bash-history.sh

@@ -11,10 +11,10 @@ content: |
   trace=$1
 
   if test -n trace; then {
-    echo TAP INTERFACE $tapif USER $user
+    echo TAP INTERFACE $tapif USER $USER
   } fi
 
-  sudo ip tuntap add $tapif mode tap user $user
+  sudo ip tuntap add $tapif mode tap user $USER
   sudo ip link set $tapif up
   sleep 0.5s
   sudo ip link set $tapif master br0
@@ -59,13 +59,16 @@ action:
 content: |
   # kill.sh generated $date by eVirt
 
+  ip tuntap del $tapif mode tap
   # nope, cut doesnt deal with eading spaces well - it moves the index
   # kill -HUP $(ps ax |grep $vmname |grep -v grep | cut -f 1 -d ' ')
 
   # so use awk
-  sudo kill -HUP $(ps ax |grep $vmname |grep -v grep | awk '{ print $1; }' )
-  ip tuntap del $tapif mode tap
-  echo $vmname killed.
+  if sudo kill -HUP $(ps ax |grep $vmname |grep -v grep | awk '{ print $1; }' ) ; then
+    echo $vmname killed.
+  else
+    echo $vmname not running.
+  fi
 ---
 section: status.sh
 action:
@@ -172,13 +175,18 @@ content: |
   privkey=$privkey
 
   if test -n "$fullip"; then
+    ssh $user@$fullip -o stricthostkeychecking=true ls
+    if test $? -eq 255; then 
+      ssh-keygen -f ~/.ssh/known_hosts -R $fullip
+    fi
+
     if test ${privkey} && test -e $privkey; then
         sudo stuffit ssh -i $privkey -o StrictHostKeyChecking=no $user@$fullip
     else
         sudo stuffit ssh -o StrictHostKeyChecking=no $user@$fullip
     fi
   else
-    ssh-keygen -f "/home/$user/.ssh/known_hosts" -R "[127.0.0.1]:2222"
+    ssh-keygen -f ~/.ssh/known_hosts -R "[127.0.0.1]:2222"
 
     if test ${privkey} && test -e $privkey; then
         #echo 'ssh -t -i $privkey -o StrictHostKeyChecking=no -p 2222 $user@127.0.0.1 < `tty`'

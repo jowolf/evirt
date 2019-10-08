@@ -1,0 +1,31 @@
+12/11/18 JJW
+
+doing a git pull and dc down/up - 
+
+BUT:  Perms are FUBAR - 
+
+(env) joe@nextcloud:~/docker$ git pull
+error: cannot open .git/FETCH_HEAD: Permission denied
+(env) joe@nextcloud:~/docker$ ls -l
+total 132
+drwxr-xr-x 5 joe  joe   4096 Nov 14 16:05 13.0
+drwxr-xr-x 5 joe  joe   4096 Nov 14 16:05 14.0
+drwxr-xr-x 5 root root  4096 Dec  9 21:13 15.0-rc
+-rw-r--r-- 1 joe  joe    938 Nov 14 16:05 CODE_OF_CONDUCT.md
+-rw-r--r-- 1 root root  3730 Dec  9 21:13 Dockerfile-alpine.template
+-rw-r--r-- 1 root root  4345 Dec  9 21:13 Dockerfile-debian.template
+-rw-r--r-- 1 joe  joe  34520 Nov 14 16:05 LICENSE.md
+-rw-r--r-- 1 joe  joe  16683 Nov 14 16:05 README.md
+-rwxr-xr-x 1 joe  joe     61 Nov 14 16:05 docker-cron.sh
+-rwxr-xr-x 1 joe  joe   6175 Nov 14 16:05 docker-entrypoint.sh
+-rwxr-xr-x 1 root root  4355 Dec  9 21:13 generate-stackbrew-library.sh
+-rw-r--r-- 1 joe  joe   9661 Nov 14 16:05 logo.svg
+-rw-r--r-- 1 joe  joe    700 Nov 14 16:05 stack.yml
+-rwxr-xr-x 1 root root  5122 Dec  9 21:13 update.sh
+-rw-r--r-- 1 joe  joe     39 Nov 14 16:05 upgrade.exclude
+
+
+So need to add the chown line to the spinup..
+
+j
+

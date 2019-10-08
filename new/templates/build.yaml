@@ -21,7 +21,7 @@ content: |
       gecos: $user
       shell: /bin/bash
       primary-group: $user
-      groups: [users, root, kvm, sudo, adm, audio, cdrom, dialout, floppy, video, plugdev, dip, netdev]
+      groups: [users, root, kvm, sudo, adm, docker, audio, cdrom, dialout, floppy, video, plugdev, dip, netdev]
       lock-passwd: false
       passwd: '$6$rounds=4096$9HeOrRyXEKcTYA5h$mjWahfdV6X.lIiyDwRc/6hXv.7UJCH55XZbHgOOTG3yRh/3vOg5iEukKwYV8kURYtE.GuE/SGI0sUCSAqAgkS.'
       ssh-authorized-keys:
@@ -68,15 +68,22 @@ content: |
         import sys, os, fcntl, termios
         tty = os.ttyname(sys.stdin.fileno())
         with open (tty, 'w') as fd:
-          for c in ". env/bin/activate\n":
+          for c in ". env/bin/activate\n$goto":
             fcntl.ioctl (fd, termios.TIOCSTI, c)
     - path: /root/cloud-init-runcmd.sh
       permissions: '0770'
       content: |
+        cd /home/$user
+        echo 1_MOUNTING_HOSTSHARES
+        hostmounts.sh
+        echo DONE >> 1_MOUNTING_HOSTSHARES
+
         for cmd in $spinup_command_names; do {
           #loop thru with cd and chown at front & back
           cd /home/$user
           sudo chown -R $user:$user /home/$user
+
+          #if test -e "$progress"; then progress="$progress"; fi
 
           echo DOING-$cmd
           echo START DOING-$cmd >> DOING-$cmd
@@ -87,18 +94,7 @@ content: |
           echo DONE >> DOING-$cmd
         } done
 
-        echo 5_MOUNTING_HOSTSHARES
-        hostmounts.sh
-        echo DONE >> 5_MOUNTING_HOSTSHARES
-
-        # fill bash var w/fname of startup-<n>-<whaever>.sh
-
-        if test -e startup-1-*.sh; then
-          st=`ls startup-1-*`
-          echo 6_DOING-$st-COMMANDS
-          sudo -u $user sh -c "sh $st >> 6_DOING-$st-COMMANDS 2>&1"
-          echo DONE >> 6_DOING-$st-COMMANDS
-        fi
+        # old way, still used:
 
         if test -e startup.sh; then
           echo 7_DOING_STARTUP_COMMANDS
@@ -106,10 +102,6 @@ content: |
           echo DONE >> 7_DOING_STARTUP_COMMANDS
         fi
 
-        #echo DOING_FIRSTBOOT_COMMANDS
-        #sudo -u $user sh -c "sh startup.sh >> DOING_FIRSTBOOT_COMMANDS 2>&1"
-        #echo DONE >> DOING_FIRSTBOOT_COMMANDS
-        exit
     $file1
     $file2
     $file3
@@ -148,7 +140,7 @@ content: |
   echo IMAGE FILENAME $fname
 
   # download image as basename
-  if ( ls $fname || ls $installdir/$fname ); then
+  if ( ls $fname || ls $installpath/$fname ); then
     echo DOWNLOADED BASE IMAGE PRESENT - NOT DOWNLOADING!
   else
     echo Downloading: $image
@@ -179,9 +171,9 @@ content: |
     if test -e $fname; then
       echo Copying from downloaded base image...
       cp $fname $vmname.img
-    elif test -e $installdir/$fname; then
+    elif test -e $installpath/$fname; then
       echo Copying from downloaded base image in eVirt Install dir...
-      cp $installdir/$fname $vmname.img
+      cp $installpath/$fname $vmname.img
     else
       echo No downloaded image file present - $image
     fi

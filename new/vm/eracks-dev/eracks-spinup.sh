@@ -1,0 +1,1 @@
+/home/joe/evirt/new/vm/eracks-staging/eracks-spinup.sh

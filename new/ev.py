@@ -121,11 +121,17 @@ class Section (object):
         rdpport = decls.get ('rdpport', (39000 + iplast))
         parms   = decls.get ('parms', '')
 
+
+        # stuff these characters after bin env activate:
+
+        goto = decls.get ('goto', "")
+
         # configure hostdirs / passthru folder(s)
 
         hostdirs = decls.get ('hostdirs', [])
         for n,path in enumerate (hostdirs):
           path = Template (path).safe_substitute (decls)
+          hostdirs [n] = path
           if os.access (path, os.R_OK):
             #parms += "-fsdev local,security_model=none,id=fsdev%i,path=%s -device virtio-9p-pci,id=fs%i,fsdev=fsdev%i,mount_tag=hostshare%i " % (n,path,n,n,n)
             parms += "-virtfs local,security_model=mapped-xattr,id=fs%i,path=%s,mount_tag=hostshare%i " % (n,path,n)
@@ -137,19 +143,21 @@ class Section (object):
 
         spinup = decls.get ('spinup', [])
         for n,path in enumerate (spinup):
-          path = Template (path).safe_substitute (decls)
+          path = Template (path).safe_substitute (globals())
           if not os.access (path, os.R_OK):
             print ("Warning - spinup script not found: %s" % path)
           else:
             spinup [n] = path
+            #files.insert (n, path)
 
         # update locals back to decls dict
 
         ud = dict (
-            installdir = installpath,
+            installpath = installpath,
             vmname  = vmname,
             workdir = workdir,
             ext     = ext,
+            goto    = goto,
             hda     = hda,
             hdb     = hdb,
             hdc     = hdc,
@@ -195,14 +203,14 @@ class Section (object):
         decls ['file7'] = ''
         decls ['file8'] = ''
 
-        if decls.get ('files'):
-          #print (decls ['files'])
-          for n,f in enumerate (decls ['files']):
-            #print ('FILES')
-            #print (f)
-            #print ('file%d' % (n+1))
+        files = spinup + decls.get ('files', [])
+
+        if files:
+          #print (files)
+          for n,f in enumerate (files):
             f = Template (f).safe_substitute (decls)
             if os.access (f, os.R_OK):
+              # could just append each entry to one write_files_paths decl
               decls ['file%d' % (n+1)] =   \
                 ("- path: %s\n" % (f if f.startswith('/') else os.path.join ('/home', user, f)))  + \
                  "    content: |\n"     + \

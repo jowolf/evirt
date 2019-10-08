@@ -3,7 +3,7 @@ action:
   load: declarations
 image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
 
-iplast: 7
+iplast: 16
 
 user: joe
 passwd: '$6$rounds=4096$9HeOrRyXEKcTYA5h$mjWahfdV6X.lIiyDwRc/6hXv.7UJCH55XZbHgOOTG3yRh/3vOg5iEukKwYV8kURYtE.GuE/SGI0sUCSAqAgkS.'
@@ -21,15 +21,26 @@ goto: cd eracks11/conf\ndocker-compose ps\n
 spinup:
   - preconfig-bash-history.sh
   - salt-minion.sh
-  - eracks12-staging-spinup.sh
+  - docker-compose.sh
+  - eracks-spinup.sh
 
 files:
+  #- preconfig-bash-history.sh
+  #- salt-minion.sh
+  #- docker-compose.sh
+  #- eracks-staging.sh
   #- /home/joe/.ssh/jjw-salt-deploy.id_rsa
   - /home/joe/.ssh/id_rsa_eracks-deploy
   - /home/joe/.ssh/id_rsa_gitlab
-  - /home/joe/.ssh/id_rsa_studio
   - /home/$user/.config/mc/ini
   #- $user/.ssh/id_rsa
+  #- .ssh/id_rsa_jjw
+  #- .ssh/id_rsa_eracks
+
+
+#git_repo: git@github.com:jowolf/jjw-salt-master.git
+#git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
+#git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
 
 ---
 section: parents

@@ -1,57 +1,23 @@
 section: declarations
 action:
   load: declarations
-iplast: 0 # 15
+iplast: 40
 image: https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img
-vmname: nextcloud
-user: joe
+vmname: serog-1804
+user: britta
 passwd: '$6$rounds=4096$9HeOrRyXEKcTYA5h$mjWahfdV6X.lIiyDwRc/6hXv.7UJCH55XZbHgOOTG3yRh/3vOg5iEukKwYV8kURYtE.GuE/SGI0sUCSAqAgkS.'
+#passwd: '$6$rounds=4096$q41EsnW2/DVC$J8BIH1C5T5jJ5tA9RlabCovE.A92z7A2fc0hW9ZhMUe9VgsTXEjSO9ECp7EjcEDtUbB3VFZe/50FdY0acIySa/'
 key: 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAvYqSpJvAKMqxSa9Mzhdw7pFk/UOzEOith8UolvC5HpeRieZFwPdXeEDbsVSXlzQqy0v1i226W8+CPX9JX82VWI2RZIkB3sJq3AEELO3pDbDe/Uc1WsTzbN6QUBlpl2OvZB0bBvkGbbATUU2xXefDV/g3ma4k1HkiQIAB6Ymw6XM8+5iznhx8ERsUUE9V9NGc52ujAr4Sz5E+wgLxZXWKW25IiPfAMOHvlEzfiL4S3Q8YruSy337C54ttf8VFwBHcotzybhOIUEqCqsAc70RLlhNpafNLx/sJD/yJ+R3AO0z6Brm8eVeax56gSs4eIdY23tufX2drL8ZnY1LNNhdV9w== joe@STUDIO'
 permanent: True
 size: 20G
 ram: 2G
-# for local, no need for net / IP address / Macaddr
-#net: "-net nic -net user,hostfwd=tcp::2222-:22"
-net: "-netdev user,id=nic1,hostfwd=tcp::2222-:22 -device virtio-net,netdev=nic1"
-vnc: ""
-#parms: -vga vmware
-#parms: -k en-us
-#parms: -usbdevice tablet
-#parms: -snapshot
-#parms: -boot $boot
-#parms: -cdrom $cdrom
-#parms: -hdb $hdb
-#parms: -hdc $hdc
-#parms: -hdd $hdd
-#date: eval import datetime;datetime.date.today().isoformat()  # $live - this could be either contextual, or a builtin
-workdir: .evirt
-#parms: -display gtk Nope! not compiled in
-#hda: $vmname.img
-#hdb: cloudinit.img
-# potential new incremental replacement decls:
-#iplast: decls.get ('iplast', int(os.path.basename(os.getcwd())))  # last tumbler of IP4 address
-#macaddr: eval "de:ad:be:ef:%02d:%02d" % (iplast / 100, iplast % 100)
-#net:     eval "-net nic,macaddr=%s -net tap,ifname=tap-%s,script=no,downscript=no" % (macaddr, iplast)
-#vncport: eval 59000 + iplast - 5900
-#monport: eval 23000 + iplast
-#mon:     eval "-monitor telnet:127.0.0.1:%s,server,nowait,nodelay" % monport
-#vnc:     eval "-vnc :%s" % vncport
-#rdpport = decls.get ('rdpport', 39000 + iplast)
-
 git_repo: git@github.com:jowolf/jjw-salt-master.git
 #git_repo_key: /home/joe/.ssh/id_rsa_jjw-salt-deploy
 git_repo_key: /home/joe/.ssh/jjw-salt-deploy.id_rsa
-
-#Todo:
-#salted: False
-#commands: []  # list or run-cmds for cloud-init - $cmd1 $cmd2 ...
-
 files:
   # same as git_repo_key, above:
   - /home/joe/.ssh/jjw-salt-deploy.id_rsa
-  #- docker-compose.yaml
   #- /home/joe/eracks11/conf/docker-compose.yml
-  #- $user/.ssh/id_rsa
   #- .ssh/id_rsa_jjw
   #- .ssh/id_rsa_eracks
 ---
@@ -116,11 +82,11 @@ content: |
       content: |
         auto ens3
         iface ens3 inet static
-          address 216.172.134.$iplast
+          address 216.172.133.$iplast
           #network 216.172.134.0
           netmask 255.255.255.128
           #broadcast 216.172.134.255
-          gateway 216.172.134.1
+          gateway 216.172.133.1
           dns-nameservers 72.13.81.2 72.13.91.2 8.8.8.8 4.2.2.1 4.2.2.2 4.2.2.3
         local-hostname: $host
     - path: /root/.ssh/id_rsa_eracks-deploy
@@ -207,7 +173,7 @@ content: |
         -----END RSA PRIVATE KEY-----
   write_files:
     #- path: /var/lib/cloud-compose/docker-compose.yml
-    - path: /home/joe/docker-compose.yml
+    - path: /home/$user/docker-compose.yml
       content: |
         version: '3'
         services:
@@ -216,6 +182,20 @@ content: |
             restart: always
             ports:
               - 8080:80
+    #- path: /etc/cloud/cloud.cfg.d/custom-networking.cfg
+    #  content: |
+    #      network:
+    #        version: 2
+    #        ethernets:
+    #          ens3:
+    #            addresses:
+    #              - 216.172.133.$iplast/24
+    #            match:
+    #              macaddress: $macaddr
+    #            gateway4: 216.172.133.1
+    #            nameservers:
+    #              search: [serog.com, serog.org]
+    #              addresses: [8.8.8.8, 1.1.1.1, 4.2.2.2, 4.2.2.3]
     - path: /root/cloud-init-runcmd.sh
       permissions: '0770'
       comment: |
@@ -249,16 +229,16 @@ content: |
         salt-call --local --file-root=. state.apply hostname-from-minion-id
 
       content: |
-        touch DOING_KEYSCAN
-        sudo -u joe ssh-keyscan -H github.com >>/home/joe/.ssh/known_hosts
-        touch PRECONFIG_BASH_HISTORY
-        echo tail -f /var/log/cloud-init-output.log >> /home/joe/.bash_history
-        echo less /var/log/cloud-init-output.log >> /home/joe/.bash_history
+        #touch DOING_KEYSCAN
+        #sudo -u joe ssh-keyscan -H github.com >>/home/joe/.ssh/known_hosts
+        #touch PRECONFIG_BASH_HISTORY
+        #echo tail -f /var/log/cloud-init-output.log >> /home/joe/.bash_history
+        #echo less /var/log/cloud-init-output.log >> /home/joe/.bash_history
         touch CLONE_GIT_REPO
         ssh-agent bash -c 'ssh-add $git_repo_key && git clone -q $git_repo'
-        touch CHOWN_JOE
-        sudo chown -R joe:joe /home/joe
-        cd /home/joe
+        touch CHOWN_$user
+        sudo chown -R $user /home/$user
+        cd /home/$user
 
         echo SETTING UP DOCKER_COMPOSE
         touch SETTING_UP_DOCKER_COMPOSE
@@ -278,7 +258,7 @@ content: |
     $file2
     $file3
   comment: |
-    commentes ANYWHERE in the runcmd list break the module - sheesh.
+    comments ANYWHERE in the runcmd list break the module - sheesh.
     echo Wow! comments break the runcmd of cloudinit: \# $cmd2 $cmd3 etc
   runcmd:
     - cd /root
@@ -291,21 +271,53 @@ action:
   save: $workdir
 content: |
   #dsmode: local
-  instance-id: $vmname;
+  instance-id: $vmname
+comment:
+  network:
+    version: 2
+    ethernets:
+      ens3:
+        addresses:
+          - 216.172.133.$iplast/24
+        match:
+          macaddress: $macaddr
+        gateway4: 216.172.133.1
+        nameservers:
+          search: [serog.com, serog.org]
+          addresses: [8.8.8.8, 1.1.1.1, 4.2.2.2, 4.2.2.3]
+comment-2:
   network-interfaces: |
-    auto ens3
+    #auto ens3
     #iface ens3 inet dhcp
     iface ens3 inet static
       # for local VMs, at least on LGram, this is the lxc bridge nw
-      address 10.0.3.$iplast
-    #  address 216.172.133.$iplast
-    #  #network 216.172.133.0
+      address 216.172.133.$iplast
+      network 216.172.133.0
       netmask 255.255.255.0
-    #  #broadcast 216.172.133.255
-    #  gateway 216.172.133.1
-      gateway 10.0.3.1
+      broadcast 216.172.133.255
+      gateway 216.172.133.1
+      # address 10.0.3.$iplast
+      # gateway 10.0.3.1
       dns-nameservers 72.13.81.2 72.13.91.2 1.1.1.1 8.8.8.8 4.2.2.1 4.2.2.2 4.2.2.3
   local-hostname: $vmname
+---
+section: network-config-v2.yaml
+action:
+  save: $workdir
+content: |
+    #network:
+    version: 2
+    ethernets:
+      ens3:
+        set-name: ens3
+        addresses:
+          - 216.172.133.$iplast/24
+        match:
+          macaddress: $macaddr
+        gateway4: 216.172.133.1
+        nameservers:
+          search: [serog.com, serog.org]
+          addresses: [8.8.8.8, 1.1.1.1, 4.2.2.2, 4.2.2.3]
 ---
 section: start.sh
 action:
@@ -314,6 +326,18 @@ action:
         help: Start the VM
 content: |
   # start.sh generated $date by eVirt
+
+  tapif=tap-$iplast
+  user=`whoami`
+  echo TAP INTERFACE $tapif USER joe
+  # $user
+
+  sudo ip tuntap add $1 mode tap user joe
+  # $user
+  sudo ip link set $tapif up
+  sleep 0.2s
+  sudo ip link set $tapif master br0
+
   log=$vmname.log
   #daemon="daemon -D $vmdir -n $vmname -o $log -l $log --verbose -- "
   #command="$daemon kvm $parms $vnc $mon $net $hda"
@@ -376,8 +400,7 @@ content: |
   # mount.sh generated $date by eVirt
   echo Mounting guest FS for $vmname
   mkdir -p .mount
-  #guestmount -a $vmname.img -i --ro .mount
-  guestmount -a $vmname.img -i -w .mount
+  guestmount -a $vmname.img -i --ro .mount
 ---
 section: unmount.sh
 action:
@@ -397,24 +420,12 @@ action:
         help: Download the bootable image defined in declarations
 content: |
   # download.sh generated $date by eVirt
-
-  # Convert python-replaced variable into bash var:
-  ${image="$image"}
-
-  echo IMAGE ${image}
-
-  # Check for remote / downloadable:
-  if ! ( ${image:0:4} == 'http' ); then {
-    echo Image $image is local - not downloading
-    exit
-  } fi
-
   # download image as basename
   if ( ls -l `basename $image` ); then
     echo IMAGE PRESENT - NOT DOWNLOADING!
   else
     echo Downloading: $image
-    wget -O `basename $image` $image
+    wget -p $image -O `basename $image`
   fi
 ---
 section: build.sh
@@ -426,32 +437,26 @@ action:
 content: |
   # copy downloaded image as $vmname.img
   if ( ls -l $vmname.img ); then
-    echo IMAGE PRESENT - NOT COPYING!
+    echo VM PRESENT - NOT COPYING!
+  elif ! ( ls -l `basename $image` ); then
+    echo IMAGE NOT PRESENT!
   else
     # copy from image location:
     cp `basename $image` $vmname.img
   fi
 
   qemu-img resize $vmname.img $size
-  cloud-localds $workdir/cloudinit.img $workdir/userdata.yaml # $workdir/metadata.yaml
-  qemu-img convert -O qcow2 -c .evirt/cloudinit.img .evirt/cloudinit.qc2
+  cloud-localds -v --network-config=$workdir/network-config-v2.yaml $workdir/cloudinit.img $workdir/userdata.yaml $workdir/metadata.yaml
+  qemu-img convert -O qcow2 -c $workdir/cloudinit.img $workdir/cloudinit.qc2
+  #qemu-img convert -O qcow2 -c .evirt/cloudinit.img .evirt/cloudinit.qc2
   #qemu-img convert -O qcow2 -c $vmname.img $vmname.qc2
 ---
-section: default.sh
+section: setup.sh
 action:
   command:
-    default:
-        help: Show running VMs
+    setup:
+        help: Set up new vm dir with ev.yaml example, .evirt workdir & scripts
 content: |
-  echo All VMs:
-  ps axw |grep kvm | grep -v grep
-
-  echo
-  echo This VM:
-  ps axw | grep $vmname | grep -v grep
-  exit
-
-  # old setup:
   # copy ev.yaml fropm install dir
    if ( ls -l ev.yaml ); then
     echo EV.YAML ALREADY PRESENT - NOT OVERWRITING!

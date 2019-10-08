@@ -1,3 +1,71 @@
+10/22 todo
+get this done for user Joe:
+git config --global user.email "joe@eracks.com"
+git config --global user.name "Joseph Wolff"
+
+also .ssh/config, studio key, keychain / agent
+
+add / modify default packages list
+add / modify default goto and dir
+
+
+10/19 todo: implement 'inherit' decl - perfect for erack dev/prod/staging
+
+10/15 todo
+d add goto: to be stuffed in go
+d certs
+
+10/11
+files:
+- append each files entry to one write_files_paths decl, dispense with file1-file8
+- need way to specify destination, or at least when to basename
+    prepend period? no
+    use islist and isdict? maybe
+
+domains: add evirt1, 2, 3; t fix eracks-staging (t and dev)
+
+get new nextcloud up
+
+need way to combine / modularize spinups and files; maybe yamls - eg docker-compose & go.sh
+
+10/10
+- Migrate salt-minions to newer version
+t - change sm IP to desqhost for now
+- change minions sm fm dh to sm
+- change sm ip back to 22
+
+2x OBSD
+
+Blog post: our (non)-SM mobos - you might see some SM chasses in some of our models -
+yes we use SM chasses, but that's where the similarity ends -
+we certify our own mobos for our models, and inspect the chipsets for ANY suspicious-looking parts -
+and we use only new, non-refurbished compoenets from mainstream, reputable suppliers -
+see our "Components" post -
+so the likelihood of any rogue (or worse, manufacturer-installed)
+snooping or "surveillance" hardware getting past us and our certification process is minimal - slim to none.
+
+In addition, we will install an OpenBios-based mobo on request, for those concerned about
+closed firmware "Blobs", possibly containing trojan surveillance software or other malware
+(link to recent Wired story about russian bios/firmware-based malware)
+
+
+
+10/9/18 #2 todo
+
+add vm to dropbox/tech/.ssh/config with -o nostrictchecking
+
+
+10/9/18 todo
+
+d resolve issue: need joe (or tuntap admin) user on host, different than user on guest
+
+nfg test new passwords
+
+*look for spinup scripts in install dir too
+*Have spinup: entry imply files: entry
+
+hostdir status, progress: status/
+
 
 10/4 OK afew avenues possible:
 1) enh files: section
@@ -11,7 +79,7 @@
 
 3) use shared host dirs - copy, startup.d or firstboot
 - slick, elegant, easier to implement
-- security issues - too easy to root 
+- security issues - too easy to root
 - could explicitly require commands to be named, reducing benefit too
 
 4) add commands: or spinup: section
@@ -113,15 +181,15 @@ for f in /sys/bus/virtio/drivers/9pnet_virtio/virtio*; do
 done
 
 
-9/21 hostdir shared folders (and other things) are flawed - 
-there's no DRY, unified, encapsulated view - 
-You still have to put sh*t in 2 diverse places that has to match - 
-ie, hostshare0-4 with the mount statement, presumably 
+9/21 hostdir shared folders (and other things) are flawed -
+there's no DRY, unified, encapsulated view -
+You still have to put sh*t in 2 diverse places that has to match -
+ie, hostshare0-4 with the mount statement, presumably
   inside the guest in a script or append to /etc/fstab
 
 yuk.
 
-Worse: eg: mattermost volumes are in 3 places - 
+Worse: eg: mattermost volumes are in 3 places -
 - mkdir in host
 - mount and mkdir (subfolders) in new vm
 - volume mount in docker instances
@@ -169,7 +237,7 @@ implement --trace opt
 
 
 9/13/18 Todo:
-dl base images to known dir, reuse - currently as of today have to copy manually to $installdir
+dl base images to known dir, reuse - currently as of today have to copy manually to $installpath
 
 have default / all not require ev.yaml -
   - this will require separation of copy/do from load -
@@ -254,7 +322,7 @@ sudo iptables -P FORWARD ACCEPT
 6/23
 rescue or boot cmd to boot from cd image
 default command - list running vms
-add $user, $installdir, and $cwd (tricky, could be vm or install dir) in addition to $date
+add $user, $installdir[now path], and $cwd (tricky, could be vm or install dir) in addition to $date
 htop, alpine, mosh
 
 gg:

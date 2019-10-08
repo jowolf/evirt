@@ -28,6 +28,6 @@ echo sleep 360
 sleep 360
 date
 
-salt-key -Ay
+sudo salt-key -Ay
 sudo salt -v "*" test.ping
 
