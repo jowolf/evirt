@@ -9,7 +9,7 @@ evm
 stuffit
 *.img
 *.qc2
-*.qc2.sav
+*qc2.sav
 *.qcow2
 *.xz
 *.kate-swp
